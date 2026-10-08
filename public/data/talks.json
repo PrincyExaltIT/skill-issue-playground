@@ -1,0 +1,123 @@
+[
+  {
+    "id": "signals-en-production",
+    "title": "Signals en production : un an de retours d'expérience",
+    "abstract": "Après un an de signals sur une application métier de 300 écrans : ce qui a simplifié le code, les pièges rencontrés (effets qui dérivent de l'état, mutations invisibles) et les règles d'équipe qui en sont sorties.",
+    "track": "Frontend",
+    "speakerId": "camille-laurent",
+    "room": "Amphi Turing",
+    "start": "2026-11-19T09:30:00",
+    "durationMin": 45,
+    "tags": ["angular", "signals", "architecture"]
+  },
+  {
+    "id": "httpresource-fin-des-subscribe",
+    "title": "httpResource : la fin des subscribe() ?",
+    "abstract": "httpResource est stable depuis Angular 22. Chargement, erreur, annulation et rechargement sans une ligne de RxJS : démonstration en live, limites et cas où un Observable reste le bon outil.",
+    "track": "Frontend",
+    "speakerId": "hugo-petit",
+    "room": "Salle Hopper",
+    "start": "2026-11-19T10:30:00",
+    "durationMin": 30,
+    "tags": ["angular", "http", "resource"]
+  },
+  {
+    "id": "agent-skills-review",
+    "title": "Agent Skills : apprendre à votre IA à reviewer comme un senior",
+    "abstract": "Un skill, c'est un dossier : des instructions, des scripts et des références que l'agent charge à la demande. Construisons ensemble un skill de code review, puis mesurons sa précision sur une vraie pull request.",
+    "track": "IA",
+    "speakerId": "lea-moreau",
+    "room": "Amphi Turing",
+    "start": "2026-11-19T11:30:00",
+    "durationMin": 45,
+    "tags": ["ia", "agents", "code-review"]
+  },
+  {
+    "id": "zoneless-sans-douleur",
+    "title": "Zoneless sans douleur : migrer une application existante",
+    "abstract": "Retirer zone.js d'une application de cinq ans : inventaire des setTimeout et des champs mutés, stratégie de migration écran par écran et tests qui détectent les vues figées avant la production.",
+    "track": "Frontend",
+    "speakerId": "camille-laurent",
+    "room": "Salle Lovelace",
+    "start": "2026-11-19T14:00:00",
+    "durationMin": 45,
+    "tags": ["angular", "zoneless", "migration"]
+  },
+  {
+    "id": "streams-node",
+    "title": "Streams Node.js : traiter 10 Go sans exploser la RAM",
+    "abstract": "Backpressure, pipeline() et itérateurs asynchrones : comment un export comptable qui faisait tomber nos pods tient maintenant dans 200 Mo de mémoire.",
+    "track": "Backend",
+    "speakerId": "yanis-benali",
+    "room": "Salle Hopper",
+    "start": "2026-11-19T14:00:00",
+    "durationMin": 45,
+    "tags": ["node", "streams", "performance"]
+  },
+  {
+    "id": "mcp-en-pratique",
+    "title": "MCP en pratique : brancher vos outils internes sur un agent",
+    "abstract": "Le Model Context Protocol permet d'exposer un outil interne à n'importe quel agent. Exemple complet avec un serveur MCP pour notre backlog, et les garde-fous indispensables avant de le donner à toute l'équipe.",
+    "track": "IA",
+    "speakerId": "lea-moreau",
+    "room": "Salle Lovelace",
+    "start": "2026-11-19T16:00:00",
+    "durationMin": 30,
+    "tags": ["ia", "mcp", "outillage"]
+  },
+  {
+    "id": "signal-forms-accessibles",
+    "title": "Des formulaires accessibles avec les Signal Forms",
+    "abstract": "Labels, messages d'erreur annoncés, focus sur le premier champ invalide : construisons un formulaire Signal Forms qui passe un audit RGAA, et voyons ce que le framework fait déjà pour nous.",
+    "track": "Frontend",
+    "speakerId": "ines-haddad",
+    "room": "Amphi Turing",
+    "start": "2026-11-20T09:30:00",
+    "durationMin": 45,
+    "tags": ["angular", "accessibilité", "formulaires"]
+  },
+  {
+    "id": "ci-monorepo",
+    "title": "Diviser par trois le temps de CI d'un monorepo",
+    "abstract": "Cache distant, graphe de dépendances et tests affectés : le chemin qui nous a fait passer de 38 à 12 minutes par pull request, et les métriques à suivre pour que ça dure.",
+    "track": "DevEx",
+    "speakerId": "thomas-girard",
+    "room": "Salle Hopper",
+    "start": "2026-11-20T10:30:00",
+    "durationMin": 45,
+    "tags": ["ci", "monorepo", "cache"]
+  },
+  {
+    "id": "postgres-jsonb",
+    "title": "PostgreSQL et JSONB : le bon, la brute et le full scan",
+    "abstract": "JSONB permet d'aller vite, jusqu'au jour où une requête met huit secondes. Index GIN, colonnes générées et lecture de plans d'exécution sur des cas tirés de la production.",
+    "track": "Backend",
+    "speakerId": "yanis-benali",
+    "room": "Salle Lovelace",
+    "start": "2026-11-20T11:30:00",
+    "durationMin": 30,
+    "tags": ["postgresql", "sql", "performance"]
+  },
+  {
+    "id": "review-assistee-ia",
+    "title": "Code review assistée par IA : ce qui marche vraiment",
+    "abstract": "Six mois de revues assistées sur quarante dépôts : taux de faux positifs, commentaires réellement appliqués et organisation qui permet aux humains de se concentrer sur la conception.",
+    "track": "IA",
+    "speakerId": "thomas-girard",
+    "room": "Amphi Turing",
+    "start": "2026-11-20T14:00:00",
+    "durationMin": 45,
+    "tags": ["ia", "code-review", "qualité"]
+  },
+  {
+    "id": "vitest-angular",
+    "title": "Vitest et Angular : des tests rapides qui testent vraiment quelque chose",
+    "abstract": "Depuis Angular 21, Vitest est le runner par défaut. Tester un comportement plutôt qu'une création de composant, moquer HTTP proprement et se passer de fakeAsync en zoneless.",
+    "track": "DevEx",
+    "speakerId": "hugo-petit",
+    "room": "Salle Hopper",
+    "start": "2026-11-20T15:00:00",
+    "durationMin": 30,
+    "tags": ["angular", "vitest", "tests"]
+  }
+]

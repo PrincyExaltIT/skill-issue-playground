@@ -1,0 +1,44 @@
+[
+  {
+    "id": "camille-laurent",
+    "name": "Camille Laurent",
+    "company": "Studio Hexa",
+    "bio": "Architecte front-end, Camille accompagne des équipes Angular depuis la v2. Elle défend des composants simples, typés et testés, et a migré trois applications vers le mode zoneless en 2026.",
+    "handle": "@camille.codes"
+  },
+  {
+    "id": "hugo-petit",
+    "name": "Hugo Petit",
+    "company": "Indépendant",
+    "bio": "Consultant Angular et formateur. Hugo aide les équipes à remplacer leurs empilements de subscribe() par des signals et des resources, sans tout réécrire.",
+    "handle": "@hugo.signals"
+  },
+  {
+    "id": "yanis-benali",
+    "name": "Yanis Benali",
+    "company": "Kairos Pay",
+    "bio": "Staff engineer sur une plateforme de paiement. Yanis passe ses journées entre Node.js, PostgreSQL et les flame graphs, et ses soirées à expliquer pourquoi l'index n'est pas utilisé.",
+    "handle": "@yanis.dev"
+  },
+  {
+    "id": "lea-moreau",
+    "name": "Léa Moreau",
+    "company": "Orbital Labs",
+    "bio": "Ingénieure ML, Léa construit des agents qui outillent les développeurs : revue de code, migrations, tri des tickets. Elle s'intéresse surtout à ce qui rend un agent fiable et mesurable.",
+    "handle": "@lea.moreau"
+  },
+  {
+    "id": "thomas-girard",
+    "name": "Thomas Girard",
+    "company": "Quanta Cloud",
+    "bio": "Developer advocate. Thomas mesure tout ce qui ralentit les développeurs, du temps de CI aux revues qui traînent, et propose des outils pour que ça aille plus vite.",
+    "handle": "@tgirard"
+  },
+  {
+    "id": "ines-haddad",
+    "name": "Inès Haddad",
+    "company": "Atelier Lumen",
+    "bio": "Responsable accessibilité. Inès audite des applications publiques et forme les équipes front à concevoir des interfaces utilisables au clavier et au lecteur d'écran.",
+    "handle": "@ines.a11y"
+  }
+]
