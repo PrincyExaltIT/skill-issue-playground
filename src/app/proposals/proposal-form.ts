@@ -30,14 +30,10 @@ export default class ProposalForm implements OnInit {
     bio: [''],
   });
   draft: Record<string, unknown> = {};
-  charCount = signal(0);
+  charCount = computed(() => this.abstract().length);
   submitted = false;
 
   constructor() {
-    effect(() => {
-      this.charCount.set(this.abstract().length);
-    });
-
     effect(() => {
       localStorage.setItem(ABSTRACT_DRAFT_KEY, this.abstract());
     });
