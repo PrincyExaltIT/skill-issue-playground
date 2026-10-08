@@ -1,5 +1,5 @@
 import { DatePipe } from '@angular/common';
-import { Component, computed, input, output } from '@angular/core';
+import { Component, computed, input, output, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { initialsOf } from './initials';
 import { Speaker, Talk } from './talk.model';
@@ -22,8 +22,14 @@ export class TalkCard {
   readonly favoriteToggled = output<string>();
 
   protected readonly initials = computed(() => initialsOf(this.speaker()?.name ?? ''));
+  protected readonly feedback = signal('');
 
   protected toggleFavorite(): void {
+    if (!this.isFavorite) {
+      this.feedback.set('Ajouté à vos favoris');
+    } else {
+      this.feedback.set('Retiré de vos favoris');
+    }
     this.favoriteToggled.emit(this.talk().id);
   }
 }
