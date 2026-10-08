@@ -1,5 +1,14 @@
 import { DatePipe, NgFor, NgIf } from '@angular/common';
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnInit, Output, inject } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  DestroyRef,
+  EventEmitter,
+  Input,
+  OnInit,
+  Output,
+  inject,
+} from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { ActivatedRoute, RouterLink } from '@angular/router';
@@ -21,13 +30,14 @@ export class SpeakerSpotlight implements OnInit {
   talks: any[] = [];
   bioHtml: SafeHtml | null = null;
 
+  private destroyRef = inject(DestroyRef);
   private route = inject(ActivatedRoute);
   private sanitizer = inject(DomSanitizer);
   private speakerService = inject(SpeakerService);
   private favorites = inject(FavoritesStore);
 
   ngOnInit(): void {
-    this.route.paramMap.pipe(takeUntilDestroyed()).subscribe((params) => {
+    this.route.paramMap.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((params) => {
       const id = params.get('id') ?? this.speakerId;
       this.speakerService.getSpeaker(id).subscribe((speaker) => {
         this.speaker = speaker;
