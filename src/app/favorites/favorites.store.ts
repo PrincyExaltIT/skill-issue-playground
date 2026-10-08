@@ -25,7 +25,7 @@ export class FavoritesStore {
   }
 
   add(id: string): void {
-    this.ids().push(id);
+    this.ids.update((ids) => (ids.includes(id) ? ids : [...ids, id]));
   }
 }
 

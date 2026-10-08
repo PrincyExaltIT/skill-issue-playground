@@ -31,6 +31,20 @@ describe('FavoritesStore', () => {
     expect(store.favoriteIds()).toEqual(['mcp-en-pratique']);
   });
 
+  it('ajoute un talk avec add(), sans doublon, et notifie les lecteurs', () => {
+    const store = TestBed.inject(FavoritesStore);
+    const before = store.favoriteIds();
+
+    store.add('mcp-en-pratique');
+    store.add('mcp-en-pratique');
+    TestBed.tick();
+
+    expect(before).toEqual([]);
+    expect(store.favoriteIds()).toEqual(['mcp-en-pratique']);
+    expect(store.count()).toBe(1);
+    expect(storedIds()).toEqual(['mcp-en-pratique']);
+  });
+
   it('persiste les favoris dans localStorage', () => {
     const store = TestBed.inject(FavoritesStore);
 
