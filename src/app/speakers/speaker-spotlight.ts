@@ -1,15 +1,5 @@
 import { DatePipe, NgFor, NgIf } from '@angular/common';
-import {
-  ChangeDetectionStrategy,
-  Component,
-  DestroyRef,
-  EventEmitter,
-  Input,
-  OnInit,
-  Output,
-  inject,
-  signal,
-} from '@angular/core';
+import { Component, DestroyRef, EventEmitter, Input, OnInit, Output, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { EMPTY, catchError, distinctUntilChanged, map, switchMap, tap } from 'rxjs';
@@ -21,7 +11,6 @@ import { SpeakerService } from './speaker.service';
   imports: [NgIf, NgFor, DatePipe, RouterLink],
   templateUrl: './speaker-spotlight.html',
   styleUrl: './speaker-spotlight.css',
-  changeDetection: ChangeDetectionStrategy.Eager,
 })
 export class SpeakerSpotlight implements OnInit {
   @Input() speakerId!: string;
