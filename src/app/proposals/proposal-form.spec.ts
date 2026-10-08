@@ -29,6 +29,34 @@ describe('ProposalForm', () => {
     return found;
   }
 
+  function type(selector: string, value: string): void {
+    const field = element<HTMLInputElement | HTMLTextAreaElement>(selector);
+    field.value = value;
+    field.dispatchEvent(new Event('input'));
+  }
+
+  function submit(): void {
+    element<HTMLButtonElement>('button[type="submit"]').click();
+  }
+
+  it('affiche la confirmation après l’envoi, sans autre interaction', async () => {
+    await render();
+    vi.useFakeTimers();
+    try {
+      type('#proposal-title', 'Signals en production');
+      submit();
+
+      await vi.advanceTimersByTimeAsync(299);
+      expect(element('[role="status"]').textContent?.trim()).toBe('');
+
+      // 1 ms pour le délai de confirmation, puis le temps que le planificateur zoneless rafraîchisse la vue.
+      await vi.advanceTimersByTimeAsync(50);
+      expect(element('[role="status"]').textContent).toContain('Merci ! Votre proposition a bien été enregistrée.');
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
   it('compte les caractères du brouillon restauré dès la création', async () => {
     localStorage.setItem(ABSTRACT_DRAFT_KEY, 'Signals partout');
 

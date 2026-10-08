@@ -31,7 +31,7 @@ export default class ProposalForm implements OnInit {
   });
   draft: Record<string, unknown> = {};
   charCount = computed(() => this.abstract().length);
-  submitted = false;
+  submitted = signal(false);
 
   constructor() {
     effect(() => {
@@ -62,7 +62,7 @@ export default class ProposalForm implements OnInit {
     const proposal = { ...this.draft, abstract: this.abstract() };
     localStorage.setItem('conf-planner:last-proposal', JSON.stringify(proposal));
     setTimeout(() => {
-      this.submitted = true;
+      this.submitted.set(true);
     }, 300);
   }
 }
