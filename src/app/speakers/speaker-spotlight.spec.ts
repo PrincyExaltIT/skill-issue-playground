@@ -98,6 +98,29 @@ describe('SpeakerSpotlight', () => {
     expect(talkTitles()).toEqual(['Signals en production']);
   });
 
+  it('affiche le dernier speaker demandé même si la réponse précédente arrive en retard', async () => {
+    const slowCamille = new Subject<Speaker>();
+    speakerResponses.set('camille-laurent', slowCamille);
+
+    await openSpeakerPage('camille-laurent');
+    await openSpeakerPage('lea-moreau');
+    slowCamille.next(CAMILLE);
+    slowCamille.complete();
+    await harness.fixture.whenStable();
+
+    expect(heading()).toBe('Léa Moreau');
+    expect(talkTitles()).toEqual(['MCP en pratique']);
+  });
+
+  it("n'affiche pas les talks du speaker précédent pendant le chargement du suivant", async () => {
+    await openSpeakerPage('camille-laurent');
+    talkResponses.set('lea-moreau', new Subject<Talk[]>());
+
+    await openSpeakerPage('lea-moreau');
+
+    expect(talkTitles()).toEqual([]);
+  });
+
   it("assainit la bio HTML venue de l'API", async () => {
     speakerResponses.set(
       'camille-laurent',

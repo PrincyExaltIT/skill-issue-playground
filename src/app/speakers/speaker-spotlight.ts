@@ -12,6 +12,7 @@ import {
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, RouterLink } from '@angular/router';
+import { distinctUntilChanged, map, switchMap, tap } from 'rxjs';
 import { FavoritesStore } from '../favorites/favorites.store';
 import { SpeakerService } from './speaker.service';
 
@@ -35,15 +36,21 @@ export class SpeakerSpotlight implements OnInit {
   private favorites = inject(FavoritesStore);
 
   ngOnInit(): void {
-    this.route.paramMap.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((params) => {
-      const id = params.get('id') ?? this.speakerId;
-      this.speakerService.getSpeaker(id).subscribe((speaker) => {
-        this.speaker.set(speaker);
-        this.speakerService.getTalks(speaker.id).subscribe((talks) => {
-          this.talks.set(talks);
-        });
-      });
-    });
+    this.route.paramMap
+      .pipe(
+        map((params) => params.get('id') ?? this.speakerId),
+        distinctUntilChanged(),
+        tap(() => {
+          this.speaker.set(undefined);
+          this.talks.set([]);
+        }),
+        // switchMap annule les requêtes de l'id précédent : une réponse lente ne peut plus l'emporter.
+        switchMap((id) => this.speakerService.getSpeaker(id)),
+        tap((speaker) => this.speaker.set(speaker)),
+        switchMap((speaker) => this.speakerService.getTalks(speaker.id)),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe((talks) => this.talks.set(talks));
   }
 
   getInitials(name: string): string {
