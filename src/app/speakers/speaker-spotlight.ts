@@ -10,7 +10,6 @@ import {
   inject,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { FavoritesStore } from '../favorites/favorites.store';
 import { SpeakerService } from './speaker.service';
@@ -28,11 +27,9 @@ export class SpeakerSpotlight implements OnInit {
 
   speaker: any;
   talks: any[] = [];
-  bioHtml: SafeHtml | null = null;
 
   private destroyRef = inject(DestroyRef);
   private route = inject(ActivatedRoute);
-  private sanitizer = inject(DomSanitizer);
   private speakerService = inject(SpeakerService);
   private favorites = inject(FavoritesStore);
 
@@ -41,7 +38,6 @@ export class SpeakerSpotlight implements OnInit {
       const id = params.get('id') ?? this.speakerId;
       this.speakerService.getSpeaker(id).subscribe((speaker) => {
         this.speaker = speaker;
-        this.bioHtml = this.sanitizer.bypassSecurityTrustHtml(speaker.bio);
         this.speakerService.getTalks(speaker.id).subscribe((talks) => {
           this.talks = talks;
         });

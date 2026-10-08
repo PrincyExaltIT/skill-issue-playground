@@ -2,7 +2,8 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { RouterTestingHarness } from '@angular/router/testing';
 import { EMPTY, of } from 'rxjs';
-import { SPEAKERS, TALKS } from '../talks/testing/talk-fixtures';
+import { Speaker } from '../talks/talk.model';
+import { CAMILLE, SPEAKERS, TALKS } from '../talks/testing/talk-fixtures';
 import { SpeakerSpotlight } from './speaker-spotlight';
 import { SpeakerService } from './speaker.service';
 
@@ -10,10 +11,13 @@ describe('SpeakerSpotlight', () => {
   let component: SpeakerSpotlight;
   let fixture: ComponentFixture<SpeakerSpotlight>;
 
+  /** Speakers connus de l'API simulée ; un test peut en remplacer le contenu. */
+  let apiSpeakers: Speaker[];
+
   /** Faux SpeakerService : un id inconnu n'émet rien, la page reste en chargement. */
   const speakerService = {
     getSpeaker: vi.fn((id: string) => {
-      const speaker = SPEAKERS.find((candidate) => candidate.id === id);
+      const speaker = apiSpeakers.find((candidate) => candidate.id === id);
       return speaker ? of(speaker) : EMPTY;
     }),
     getTalks: vi.fn((speakerId: string) => of(TALKS.filter((talk) => talk.speakerId === speakerId))),
@@ -21,6 +25,7 @@ describe('SpeakerSpotlight', () => {
 
   beforeEach(async () => {
     vi.clearAllMocks();
+    apiSpeakers = SPEAKERS;
     await TestBed.configureTestingModule({
       imports: [SpeakerSpotlight],
       providers: [
@@ -53,5 +58,15 @@ describe('SpeakerSpotlight', () => {
       'Signals en production',
       'Sécurité front : XSS et sanitizer',
     ]);
+  });
+
+  it("assainit la bio HTML venue de l'API", async () => {
+    apiSpeakers = [{ ...CAMILLE, bio: '<strong>Architecte</strong> <img src="x" onerror="alert(1)">' }];
+
+    const page = await openSpeakerPage('camille-laurent');
+    const bio = page.querySelector('.spotlight__bio');
+
+    expect(bio?.querySelector('strong')?.textContent).toBe('Architecte');
+    expect(bio?.querySelector('img')?.hasAttribute('onerror')).toBe(false);
   });
 });
