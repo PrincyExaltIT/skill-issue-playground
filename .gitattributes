@@ -1,0 +1,3 @@
+# Fins de ligne LF partout : numéros de ligne et extraits identiques sur tous les OS.
+* text=auto eol=lf
+*.ico binary
