@@ -60,15 +60,32 @@
 }
 
 .talk {
+  position: relative;
   padding: 0.75rem 1rem;
   margin-top: 0.75rem;
   border: 1px solid var(--line);
   border-radius: 10px;
-  cursor: pointer;
 }
 
 .talk:hover {
   border-color: var(--brand);
+}
+
+.talk__select {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+/* Toute la carte reste cliquable, mais l'action est un vrai bouton (clavier, lecteur d'écran). */
+.talk__select::after {
+  content: '';
+  position: absolute;
+  inset: 0;
 }
 
 .talk h3 {

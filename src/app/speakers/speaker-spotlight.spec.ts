@@ -141,13 +141,15 @@ describe('SpeakerSpotlight', () => {
     expect(talkTitles()).toEqual([]);
   });
 
-  it("émet l'id du talk choisi via talkSelected", async () => {
+  it("émet l'id du talk choisi via un bouton accessible au clavier", async () => {
     await openSpeakerPage('camille-laurent');
     const spotlight = harness.routeDebugElement?.componentInstance as SpeakerSpotlight;
     const selected: string[] = [];
     spotlight.talkSelected.subscribe((id) => selected.push(id));
 
-    page().querySelector<HTMLElement>('.talk')?.click();
+    const select = page().querySelector<HTMLButtonElement>('.talk h3 button[type="button"]');
+    expect(select?.textContent?.trim()).toBe('Signals en production');
+    select?.click();
 
     expect(selected).toEqual(['signals-en-production']);
   });

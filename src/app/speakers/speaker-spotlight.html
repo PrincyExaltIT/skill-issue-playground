@@ -23,8 +23,10 @@
     <p class="status status--error" role="alert">Impossible de charger ses talks. Réessayez plus tard.</p>
   }
 
-  <div class="talk" *ngFor="let talk of talks()" (click)="talkSelected.emit(talk.id)">
-    <h3>{{ talk.title }}</h3>
+  <div class="talk" *ngFor="let talk of talks()">
+    <h3>
+      <button type="button" class="talk__select" (click)="talkSelected.emit(talk.id)">{{ talk.title }}</button>
+    </h3>
     <p>{{ talk.start | date: 'EEE d MMM · HH:mm' }} · {{ talk.room }}</p>
   </div>
 </section>
