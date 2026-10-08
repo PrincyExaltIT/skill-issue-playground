@@ -1,6 +1,5 @@
 import { Routes } from '@angular/router';
 import { ProposalGuard } from './proposals/proposal.guard';
-import { SpeakerSpotlight } from './speakers/speaker-spotlight';
 
 export const routes: Routes = [
   {
@@ -19,7 +18,11 @@ export const routes: Routes = [
     loadComponent: () => import('./talks/talk-detail'),
     title: 'Talk · Conf Planner',
   },
-  { path: 'speakers/:id', component: SpeakerSpotlight, title: 'Speaker · Conf Planner' },
+  {
+    path: 'speakers/:id',
+    loadComponent: () => import('./speakers/speaker-spotlight').then((m) => m.SpeakerSpotlight),
+    title: 'Speaker · Conf Planner',
+  },
   {
     path: 'proposals',
     loadComponent: () => import('./proposals/proposal-form'),
