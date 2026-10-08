@@ -12,7 +12,7 @@ import {
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, RouterLink } from '@angular/router';
-import { distinctUntilChanged, map, switchMap, tap } from 'rxjs';
+import { EMPTY, catchError, distinctUntilChanged, map, switchMap, tap } from 'rxjs';
 import { FavoritesStore } from '../favorites/favorites.store';
 import { SpeakerService } from './speaker.service';
 
@@ -29,6 +29,7 @@ export class SpeakerSpotlight implements OnInit {
 
   readonly speaker = signal<any>(undefined);
   readonly talks = signal<any[]>([]);
+  readonly loadError = signal(false);
 
   private destroyRef = inject(DestroyRef);
   private route = inject(ActivatedRoute);
@@ -43,9 +44,17 @@ export class SpeakerSpotlight implements OnInit {
         tap(() => {
           this.speaker.set(undefined);
           this.talks.set([]);
+          this.loadError.set(false);
         }),
         // switchMap annule les requêtes de l'id précédent : une réponse lente ne peut plus l'emporter.
-        switchMap((id) => this.speakerService.getSpeaker(id)),
+        switchMap((id) =>
+          this.speakerService.getSpeaker(id).pipe(
+            catchError(() => {
+              this.loadError.set(true);
+              return EMPTY;
+            }),
+          ),
+        ),
         tap((speaker) => this.speaker.set(speaker)),
         switchMap((speaker) => this.speakerService.getTalks(speaker.id)),
         takeUntilDestroyed(this.destroyRef),

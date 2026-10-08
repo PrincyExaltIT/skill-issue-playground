@@ -1,7 +1,8 @@
+import { HttpErrorResponse } from '@angular/common/http';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { RouterTestingHarness } from '@angular/router/testing';
-import { EMPTY, Observable, Subject, of } from 'rxjs';
+import { EMPTY, Observable, Subject, of, throwError } from 'rxjs';
 import { Speaker, Talk } from '../talks/talk.model';
 import { CAMILLE, SIGNALS_TALK, SPEAKERS, TALKS } from '../talks/testing/talk-fixtures';
 import { SpeakerSpotlight } from './speaker-spotlight';
@@ -119,6 +120,15 @@ describe('SpeakerSpotlight', () => {
     await openSpeakerPage('lea-moreau');
 
     expect(talkTitles()).toEqual([]);
+  });
+
+  it('affiche une erreur quand le speaker ne peut pas être chargé', async () => {
+    speakerResponses.set('camille-laurent', throwError(() => new HttpErrorResponse({ status: 500 })));
+
+    await openSpeakerPage('camille-laurent');
+
+    expect(page().querySelector('[role="alert"]')?.textContent).toContain('Impossible de charger ce speaker');
+    expect(page().textContent).not.toContain('Chargement du speaker');
   });
 
   it("assainit la bio HTML venue de l'API", async () => {

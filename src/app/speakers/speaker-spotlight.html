@@ -26,5 +26,9 @@
 </section>
 
 <ng-template #loading>
-  <p class="status">Chargement du speaker…</p>
+  @if (loadError()) {
+    <p class="status status--error" role="alert">Impossible de charger ce speaker. Réessayez plus tard.</p>
+  } @else {
+    <p class="status">Chargement du speaker…</p>
+  }
 </ng-template>
