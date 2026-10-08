@@ -154,6 +154,14 @@ describe('SpeakerSpotlight', () => {
     expect(selected).toEqual(['signals-en-production']);
   });
 
+  it('décrit la photo du speaker pour les lecteurs d’écran', async () => {
+    speakerResponses.set('camille-laurent', of({ ...CAMILLE, photoUrl: '/photos/camille.jpg' }));
+
+    await openSpeakerPage('camille-laurent');
+
+    expect(page().querySelector('.spotlight__photo')?.getAttribute('alt')).toBe('Portrait de Camille Laurent');
+  });
+
   it("assainit la bio HTML venue de l'API", async () => {
     speakerResponses.set(
       'camille-laurent',
