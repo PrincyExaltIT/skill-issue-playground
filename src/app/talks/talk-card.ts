@@ -25,7 +25,7 @@ export class TalkCard {
   protected readonly feedback = signal('');
 
   protected toggleFavorite(): void {
-    if (!this.isFavorite) {
+    if (!this.isFavorite()) {
       this.feedback.set('Ajouté à vos favoris');
     } else {
       this.feedback.set('Retiré de vos favoris');
