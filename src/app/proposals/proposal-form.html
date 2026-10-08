@@ -12,7 +12,8 @@
 </div>
 
 <form class="proposal" [formGroup]="form" (ngSubmit)="submit()">
-  <input class="proposal__title" formControlName="title" placeholder="Titre du talk" />
+  <label for="proposal-title" class="sr-only">Titre du talk</label>
+  <input id="proposal-title" class="proposal__title" formControlName="title" placeholder="Titre du talk" />
 
   <div class="field">
     <label for="track">Track</label>
