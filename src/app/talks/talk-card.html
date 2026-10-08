@@ -1,0 +1,38 @@
+<div class="talk-card__top">
+  <span class="track-badge" [attr.data-track]="talk().track">{{ talk().track }}</span>
+  <button
+    type="button"
+    class="fav-toggle"
+    [attr.aria-pressed]="isFavorite()"
+    (click)="toggleFavorite()"
+  >
+    <span aria-hidden="true">{{ isFavorite() ? '★' : '☆' }}</span>
+    <span class="sr-only">Favori : {{ talk().title }}</span>
+  </button>
+</div>
+
+<h2 class="talk-card__title">
+  <a [routerLink]="['/talks', talk().id]">{{ talk().title }}</a>
+</h2>
+
+<p class="talk-card__when">
+  <time [attr.datetime]="talk().start">{{ talk().start | date: 'EEE d MMM · HH:mm' }}</time>
+  <span aria-hidden="true">·</span> {{ talk().durationMin }} min
+  <span aria-hidden="true">·</span> {{ talk().room }}
+</p>
+
+@if (speaker(); as person) {
+  <p class="talk-card__speaker">
+    <span class="avatar" aria-hidden="true">{{ initials() }}</span>
+    <span>
+      <span class="talk-card__speaker-name">{{ person.name }}</span>
+      <span class="talk-card__company">{{ person.company }}</span>
+    </span>
+  </p>
+}
+
+<ul class="tags" aria-label="Mots-clés">
+  @for (tag of talk().tags; track tag) {
+    <li>#{{ tag }}</li>
+  }
+</ul>

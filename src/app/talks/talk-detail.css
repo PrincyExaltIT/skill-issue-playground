@@ -1,0 +1,78 @@
+:host {
+  display: block;
+  max-width: 48rem;
+}
+
+.back-link {
+  display: inline-block;
+  margin-bottom: 1.25rem;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.back-link:hover {
+  text-decoration: underline;
+}
+
+.detail {
+  display: grid;
+  gap: 1rem;
+  padding: 2rem;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-top: 6px solid var(--track-color, var(--brand));
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-md);
+}
+
+.detail__meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem;
+  margin: 0;
+  color: var(--ink-muted);
+}
+
+.detail__meta .track-badge {
+  margin-right: 0.35rem;
+}
+
+.detail__title {
+  margin: 0;
+  font-size: clamp(1.6rem, 3vw, 2.2rem);
+}
+
+.detail__abstract {
+  margin: 0;
+  font-size: 1.08rem;
+  color: var(--ink-soft);
+}
+
+.detail .button {
+  justify-self: start;
+}
+
+.speaker {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+  margin-top: 0.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--line);
+}
+
+.speaker__name {
+  margin: 0;
+  font-size: 1.15rem;
+}
+
+.speaker__company {
+  margin: 0.15rem 0 0.6rem;
+  color: var(--ink-muted);
+  font-size: 0.92rem;
+}
+
+.speaker__bio {
+  margin: 0;
+}

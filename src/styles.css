@@ -1,1 +1,211 @@
-/* You can add global styles to this file, and also import other style files */
+/* Conf Planner : jetons de design et primitives partagées (sans framework CSS). */
+
+:root {
+  color-scheme: light;
+
+  --font-sans:
+    'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --content-width: 72rem;
+  --radius: 14px;
+
+  --bg: #f6f5fb;
+  --surface: #ffffff;
+  --ink: #17142b;
+  --ink-soft: #3f3a5a;
+  --ink-muted: #6b6683;
+  --line: #e6e3f0;
+  --line-strong: #d3cfe2;
+
+  --brand: #5b3df5;
+  --brand-soft: #eeeaff;
+  --accent: #c026d3;
+  --danger: #b42318;
+  --danger-soft: #fef3f2;
+  --favorite: #f59e0b;
+  --favorite-soft: #fff8e6;
+  --favorite-line: #f6c768;
+
+  --header-bg: #17142b;
+  --header-ink: #ffffff;
+  --header-ink-soft: #cfc9ef;
+
+  --shadow-sm: 0 1px 2px rgb(23 20 43 / 6%), 0 4px 12px rgb(23 20 43 / 4%);
+  --shadow-md: 0 2px 4px rgb(23 20 43 / 6%), 0 12px 32px rgb(23 20 43 / 10%);
+}
+
+/* Couleur d'accent par track, lisible (contraste AA) sur fond clair. */
+[data-track='Frontend'] {
+  --track-color: #b4235a;
+}
+[data-track='Backend'] {
+  --track-color: #0b6b66;
+}
+[data-track='IA'] {
+  --track-color: #5b21b6;
+}
+[data-track='DevEx'] {
+  --track-color: #92400e;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  margin: 0;
+}
+
+h1,
+h2,
+h3 {
+  line-height: 1.2;
+  letter-spacing: -0.015em;
+}
+
+a {
+  color: var(--brand);
+}
+
+:focus-visible {
+  outline: 3px solid var(--brand);
+  outline-offset: 2px;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.page-head {
+  margin-bottom: 1.5rem;
+}
+
+.page-head h1 {
+  margin: 0 0 0.35rem;
+  font-size: clamp(1.8rem, 3vw, 2.4rem);
+}
+
+.page-head__lede {
+  margin: 0;
+  color: var(--ink-muted);
+}
+
+.track-badge {
+  display: inline-block;
+  padding: 0.15rem 0.6rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--track-color, var(--brand)) 12%, white);
+  color: var(--track-color, var(--brand));
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.tags li {
+  padding: 0.1rem 0.55rem;
+  border-radius: 999px;
+  background: var(--bg);
+  color: var(--ink-soft);
+  font-size: 0.8rem;
+}
+
+.avatar {
+  display: inline-grid;
+  flex: none;
+  place-items: center;
+  width: 2.4rem;
+  height: 2.4rem;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--brand), var(--accent));
+  color: #ffffff;
+  font-size: 0.85rem;
+  font-weight: 750;
+}
+
+.avatar--lg {
+  width: 3.5rem;
+  height: 3.5rem;
+  font-size: 1.15rem;
+}
+
+.button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.55rem 1.1rem;
+  border: 1px solid var(--brand);
+  border-radius: 999px;
+  background: var(--brand);
+  color: #ffffff;
+  font: inherit;
+  font-weight: 650;
+  cursor: pointer;
+}
+
+.button--ghost {
+  background: var(--surface);
+  color: var(--brand);
+}
+
+.button--ghost[aria-pressed='true'] {
+  border-color: var(--favorite-line);
+  background: var(--favorite-soft);
+  color: var(--ink);
+}
+
+.status {
+  padding: 1rem 1.25rem;
+  border-radius: var(--radius);
+  background: var(--brand-soft);
+  color: var(--ink-soft);
+}
+
+.status--error {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  background: var(--danger-soft);
+  color: var(--danger);
+}
+
+.status--error p {
+  margin: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition: none !important;
+    animation: none !important;
+  }
+}

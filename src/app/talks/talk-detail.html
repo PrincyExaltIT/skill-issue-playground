@@ -1,0 +1,50 @@
+<a class="back-link" routerLink="/">← Retour au programme</a>
+
+@if (talks.isLoading()) {
+  <p class="status" role="status">Chargement du talk…</p>
+} @else if (talks.error()) {
+  <p class="status status--error" role="alert">Impossible de charger ce talk. Réessayez plus tard.</p>
+} @else {
+  @if (talk(); as current) {
+    <article class="detail" [attr.data-track]="current.track">
+      <p class="detail__meta">
+        <span class="track-badge" [attr.data-track]="current.track">{{ current.track }}</span>
+        <time [attr.datetime]="current.start">{{ current.start | date: 'EEEE d MMMM · HH:mm' }}</time>
+        <span aria-hidden="true">·</span> {{ current.durationMin }} min
+        <span aria-hidden="true">·</span> {{ current.room }}
+      </p>
+
+      <h1 class="detail__title">{{ current.title }}</h1>
+      <p class="detail__abstract">{{ current.abstract }}</p>
+
+      <ul class="tags" aria-label="Mots-clés">
+        @for (tag of current.tags; track tag) {
+          <li>#{{ tag }}</li>
+        }
+      </ul>
+
+      <button
+        type="button"
+        class="button button--ghost"
+        [attr.aria-pressed]="isFavorite()"
+        (click)="toggleFavorite()"
+      >
+        <span aria-hidden="true">{{ isFavorite() ? '★' : '☆' }}</span> Favori
+      </button>
+
+      @if (speaker(); as person) {
+        <section class="speaker" aria-labelledby="speaker-name">
+          <span class="avatar avatar--lg" aria-hidden="true">{{ speakerInitials() }}</span>
+          <div>
+            <h2 id="speaker-name" class="speaker__name">{{ person.name }}</h2>
+            <p class="speaker__company">{{ person.company }} · {{ person.handle }}</p>
+            <p class="speaker__bio">{{ person.bio }}</p>
+          </div>
+        </section>
+      }
+    </article>
+  } @else {
+    <h1>Talk introuvable</h1>
+    <p>Ce talk n'existe pas ou a été retiré du programme.</p>
+  }
+}

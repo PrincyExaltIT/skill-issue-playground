@@ -1,0 +1,81 @@
+<header class="page-head">
+  <h1>{{ favoritesOnly() ? 'Mes favoris' : 'Programme' }}</h1>
+  <p class="page-head__lede">
+    @if (favoritesOnly()) {
+      Les talks que vous avez marqués d'une étoile, dans l'ordre du programme.
+    } @else {
+      Deux jours, quatre tracks : marquez vos talks favoris pour composer votre programme.
+    }
+  </p>
+</header>
+
+<div class="filters">
+  <div class="filters__search">
+    <label for="search">Rechercher un talk</label>
+    <input
+      #searchBox
+      id="search"
+      type="search"
+      placeholder="Signals, IA, Vitest…"
+      autocomplete="off"
+      [value]="query()"
+      (input)="query.set(searchBox.value)"
+    />
+  </div>
+
+  <div class="filters__tracks">
+    <span id="track-filter-label" class="filters__label">Track</span>
+    <div class="chips" role="group" aria-labelledby="track-filter-label">
+      <button
+        type="button"
+        class="chip"
+        [attr.aria-pressed]="selectedTrack() === null"
+        (click)="selectedTrack.set(null)"
+      >
+        Tous
+      </button>
+      @for (option of tracks; track option) {
+        <button
+          type="button"
+          class="chip"
+          [attr.data-track]="option"
+          [attr.aria-pressed]="selectedTrack() === option"
+          (click)="selectedTrack.set(option)"
+        >
+          {{ option }}
+        </button>
+      }
+    </div>
+  </div>
+</div>
+
+@if (talks.isLoading()) {
+  <p class="status" role="status">Chargement du programme…</p>
+} @else if (talks.error()) {
+  <div class="status status--error" role="alert">
+    <p>Impossible de charger le programme.</p>
+    <button type="button" class="button" (click)="reload()">Réessayer</button>
+  </div>
+} @else if (talks.hasValue()) {
+  <p class="result-count" role="status">{{ resultLabel() }}</p>
+  <ul class="talk-grid">
+    @for (talk of visibleTalks(); track talk.id) {
+      <li>
+        <app-talk-card
+          [talk]="talk"
+          [speaker]="speakersById().get(talk.speakerId)"
+          [isFavorite]="favoriteIds().has(talk.id)"
+          (favoriteToggled)="favorites.toggle($event)"
+        />
+      </li>
+    } @empty {
+      <li class="empty">
+        @if (favoritesOnly() && favoriteIds().size === 0) {
+          Aucun favori pour l'instant : ajoutez des talks avec ☆ depuis le programme.
+        } @else {
+          Aucun talk ne correspond à ces filtres.
+        }
+      </li>
+    }
+  </ul>
+}
