@@ -24,24 +24,29 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
+      actions: read            # upload-sarif reads the workflow run
       security-events: write   # SARIF upload (code scanning)
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0       # scope.mjs needs the merge-base with the target branch
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version: 24
-      - name: Scope + scan (annotations sur le diff)
+      - name: Scope + scan (annotations sur le diff, liste complète dans le résumé)
+        # GitHub keeps 10 annotations per level and step: candidates come sorted by severity (BLOCKERs first),
+        # and the job summary lists all of them.
         run: |
           node .agents/skills/angular-review/scripts/scope.mjs --committed --quiet
           node .agents/skills/angular-review/scripts/scan.mjs --format github
+          node .agents/skills/angular-review/scripts/scan.mjs --no-save --format markdown >> "$GITHUB_STEP_SUMMARY"
       - name: Gate (BLOCKER de confiance haute uniquement)
         run: node .agents/skills/angular-review/scripts/scan.mjs --format sarif --out angular-review.sarif --fail-on BLOCKER --fail-confidence high
       - name: Upload SARIF
-        if: always()
-        continue-on-error: true   # code scanning on a private repo needs GitHub Advanced Security
-        uses: github/codeql-action/upload-sarif@v3
+        # Code scanning: public repos, or private repos with GitHub Code Security (repository variable ANGULAR_REVIEW_SARIF=true).
+        if: ${{ always() && (!github.event.repository.private || vars.ANGULAR_REVIEW_SARIF == 'true') }}
+        continue-on-error: true
+        uses: github/codeql-action/upload-sarif@v4
         with:
           sarif_file: angular-review.sarif
           category: angular-review
@@ -60,7 +65,7 @@ jobs:
       - if: env.HAS_KEY != 'true'
         run: echo "ANTHROPIC_API_KEY absent — review IA ignorée (le scan déterministe a tourné)."
       - if: env.HAS_KEY == 'true'
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
       - if: env.HAS_KEY == 'true'

@@ -4,7 +4,7 @@
 //   node scan.mjs                         uses .review/scope.json (runs scope.mjs first if missing)
 //   node scan.mjs --base origin/main      (re)computes the scope with that base
 //   node scan.mjs --files src/a.ts --all  explicit files, whole content
-//   node scan.mjs --format text|json|gitlab|sarif|github [--out file] [--fail-on BLOCKER|MAJOR] [--fail-confidence high]
+//   node scan.mjs --format text|json|gitlab|sarif|github|markdown [--out file] [--fail-on BLOCKER|MAJOR] [--fail-confidence high]
 //
 // Works without any LLM: the same script is the CI gate (see kit/ci/).
 

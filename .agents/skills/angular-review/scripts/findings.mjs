@@ -7,7 +7,7 @@
 //   node findings.mjs decide --file .review/decisions.json   batch: [{ "id": "F-001", "decision": "keep|dismiss", "severity"?, "reason"? }]
 //   node findings.mjs note --summary "..." | --praise "..." | --empirical "..."
 //   node findings.mjs render [--force]              verdict + .review/REVIEW.md (refuses while candidates remain unverified)
-//   node findings.mjs export --format gitlab|sarif|github|text [--out file] [--fail-on BLOCKER|MAJOR]
+//   node findings.mjs export --format gitlab|sarif|github|markdown|text [--out file] [--fail-on BLOCKER|MAJOR]
 //   node findings.mjs list [--status candidate|open|dismissed]
 //
 // Severities and verdict rules are the v1 ones (BLOCKER/MAJOR/MINOR/INFO; REQUEST_CHANGES/COMMENT/APPROVE).

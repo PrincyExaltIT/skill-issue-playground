@@ -4,7 +4,7 @@ description: Senior-level review of Angular changes — a branch, a PR/MR, stage
 license: MIT
 compatibility: Requires git and Node.js 18+. Runs in any Agent Skills harness; uses parallel subagents when the harness has them.
 metadata:
-  version: "2.0.0"
+  version: "2.1.0"
   author: PrincyExaltIT
   angular: "17-22"
   supersedes: "PrincyExaltIT/agent-skill angular-review 1.x"

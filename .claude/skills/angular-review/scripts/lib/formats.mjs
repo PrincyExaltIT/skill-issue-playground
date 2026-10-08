@@ -35,7 +35,7 @@ export function toSarif(findings, toolName = 'angular-review') {
         ruleId: f.ruleId,
         level: level[f.severity] ?? 'note',
         message: { text: `${f.message}${f.suggestion ? `\nFix: ${f.suggestion}` : ''}` },
-        partialFingerprints: { primaryLocationLineHash: fingerprint(f) },
+        partialFingerprints: { 'angularReview/v1': fingerprint(f) }, // primaryLocationLineHash is computed by the upload action
         locations: [{ physicalLocation: { artifactLocation: { uri: f.file }, region: { startLine: f.line } } }],
       })),
     }],
@@ -55,11 +55,30 @@ export function toText(findings) {
   return findings.map((f) => `${f.severity.padEnd(7)} ${f.ruleId.padEnd(11)} ${f.file}:${f.line}  ${f.title ?? f.message}`).join('\n');
 }
 
+/** Markdown table for a CI job summary ($GITHUB_STEP_SUMMARY): the full list, whereas GitHub keeps 10 annotations per level and step. */
+export function toMarkdown(findings) {
+  const icon = { BLOCKER: '🔴', MAJOR: '🟠', MINOR: '🟡', INFO: '🔵' };
+  if (findings.length === 0) return '### angular-review · scan\n\nAucun candidat sur les lignes modifiées.';
+  const cell = (s) => String(s ?? '').replace(/\|/g, '\\|').replace(/\r?\n/g, ' ');
+  return [
+    `### angular-review · scan (${findings.length} candidat(s))`,
+    '',
+    SEVERITY_ORDER.map((s) => `${icon[s]} ${s} : ${findings.filter((f) => f.severity === s).length}`).join(' · '),
+    '',
+    '| Sévérité | Règle | Emplacement | Constat | Confiance |',
+    '|---|---|---|---|---|',
+    ...findings.map((f) => `| ${icon[f.severity] ?? ''} ${f.severity} | \`${f.ruleId}\` | \`${cell(f.file)}:${f.line}\` | ${cell(f.title ?? f.message)} | ${f.evidence?.confidence ?? ''} |`),
+    '',
+    'Candidats du scan déterministe, avant vérification : la review complète confirme ou écarte chacun.',
+  ].join('\n');
+}
+
 export function exportAs(format, findings) {
   switch (format) {
     case 'gitlab': return toGitLab(findings);
     case 'sarif': return toSarif(findings);
     case 'github': return toGitHubAnnotations(findings);
+    case 'markdown': return toMarkdown(findings);
     case 'text': return toText(findings);
     default: return JSON.stringify(findings, null, 2);
   }
