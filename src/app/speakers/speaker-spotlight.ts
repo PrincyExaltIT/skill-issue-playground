@@ -1,5 +1,5 @@
 import { DatePipe, NgFor, NgIf } from '@angular/common';
-import { Component, DestroyRef, EventEmitter, Input, OnInit, Output, inject, signal } from '@angular/core';
+import { Component, DestroyRef, Input, OnInit, inject, output, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { EMPTY, catchError, distinctUntilChanged, map, switchMap, tap } from 'rxjs';
@@ -14,7 +14,7 @@ import { SpeakerService } from './speaker.service';
 })
 export class SpeakerSpotlight implements OnInit {
   @Input() speakerId!: string;
-  @Output() select = new EventEmitter<string>();
+  readonly talkSelected = output<string>();
 
   readonly speaker = signal<any>(undefined);
   readonly talks = signal<any[]>([]);

@@ -141,6 +141,17 @@ describe('SpeakerSpotlight', () => {
     expect(talkTitles()).toEqual([]);
   });
 
+  it("émet l'id du talk choisi via talkSelected", async () => {
+    await openSpeakerPage('camille-laurent');
+    const spotlight = harness.routeDebugElement?.componentInstance as SpeakerSpotlight;
+    const selected: string[] = [];
+    spotlight.talkSelected.subscribe((id) => selected.push(id));
+
+    page().querySelector<HTMLElement>('.talk')?.click();
+
+    expect(selected).toEqual(['signals-en-production']);
+  });
+
   it("assainit la bio HTML venue de l'API", async () => {
     speakerResponses.set(
       'camille-laurent',
