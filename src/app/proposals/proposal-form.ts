@@ -44,7 +44,9 @@ export default class ProposalForm implements OnInit {
   }
 
   ngOnInit(): void {
-    this.form.valueChanges.subscribe(v => this.draft = v);
+    this.form.valueChanges
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((value) => (this.draft = value));
 
     this.form
       .get('track')
