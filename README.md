@@ -9,6 +9,16 @@ Ce dépôt est la **cible du skill `angular-review`** :
 
 Le skill, ses références de règles, son scanner et ses évaluations vivent dans le dépôt compagnon [`PrincyExaltIT/skill-issue`](https://github.com/PrincyExaltIT/skill-issue).
 
+Le kit est **déjà installé** dans ce dépôt, comme le ferait une équipe : `.agents/skills/` (Codex, Copilot, Cursor, Gemini/Antigravity, OpenCode, Kilo Code) et `.claude/skills/` (Claude Code, Continue), avec `AGENTS.md`, le workflow GitHub `.github/workflows/angular-review.yml` et le job GitLab `.gitlab-ci.yml`.
+
+Branches :
+
+| Branche | Rôle |
+|---|---|
+| `main` | l'application saine |
+| `feat/speaker-spotlight` | la PR à relire pendant le lab (PR #1) |
+| `solution/review-fix` | **à ouvrir après le lab** : 21 corrections faites par le skill `review-fix` à partir d'une review Codex, un commit par finding |
+
 ## L'application
 
 Conf Planner affiche le programme d'une conférence tech fictive (données dans `public/data`) :
@@ -61,10 +71,10 @@ npm run build                # build de production dans dist/
 
 4. Confrontez le rapport au code : chaque finding cite une ligne. Qu'est-ce que l'agent a trouvé, raté, ou signalé à tort ?
 
-Pour voir uniquement l'étape mécanique (sans LLM), avec les deux dépôts clonés côte à côte :
+Pour voir uniquement l'étape mécanique (sans LLM) :
 
 ```bash
-node ../skill-issue/skills/angular-review/scripts/scan.mjs --base main --format text
+node .agents/skills/angular-review/scripts/scan.mjs --base main --format text
 ```
 
 Le scanner ne fait que proposer des candidats, sur les lignes modifiées. Tout ce qui demande du jugement (contexte, intention, conséquence réelle) revient aux reviewers du skill : comparez les deux sorties.
