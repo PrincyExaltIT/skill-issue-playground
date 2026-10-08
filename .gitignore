@@ -42,3 +42,6 @@ __screenshots__/
 # System files
 .DS_Store
 Thumbs.db
+
+# Rapports du skill angular-review (scope, scan, findings, REVIEW.md)
+.review/

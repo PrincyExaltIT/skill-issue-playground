@@ -17,8 +17,7 @@
 
 <p class="talk-card__when">
   <time [attr.datetime]="talk().start">{{ talk().start | date: 'EEE d MMM · HH:mm' }}</time>
-  <span aria-hidden="true">·</span> {{ talk().durationMin }} min
-  <span aria-hidden="true">·</span> {{ talk().room }}
+  · {{ talk().durationMin }} min · {{ talk().room }}
 </p>
 
 @if (speaker(); as person) {

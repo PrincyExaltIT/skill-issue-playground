@@ -9,9 +9,10 @@
     <article class="detail" [attr.data-track]="current.track">
       <p class="detail__meta">
         <span class="track-badge" [attr.data-track]="current.track">{{ current.track }}</span>
-        <time [attr.datetime]="current.start">{{ current.start | date: 'EEEE d MMMM · HH:mm' }}</time>
-        <span aria-hidden="true">·</span> {{ current.durationMin }} min
-        <span aria-hidden="true">·</span> {{ current.room }}
+        <span>
+          <time [attr.datetime]="current.start">{{ current.start | date: 'EEEE d MMMM · HH:mm' }}</time>
+          · {{ current.durationMin }} min · {{ current.room }}
+        </span>
       </p>
 
       <h1 class="detail__title">{{ current.title }}</h1>

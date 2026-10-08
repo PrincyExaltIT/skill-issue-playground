@@ -1,59 +1,70 @@
-# ConfPlanner
+# Conf Planner
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 22.2.2.
+Application de démonstration de la formation **« Skill Issue »** (Agent Skills et code review Angular).
 
-## Development server
+Ce dépôt est la **cible du skill `angular-review`** :
 
-To start a local development server, run:
+- la branche `main` est une petite application Angular 22 idiomatique, celle qu'une review exigeante doit laisser passer ;
+- la branche `feat/speaker-spotlight` est une pull request écrite dans l'urgence, avec des défauts à trouver. C'est le terrain du lab.
 
-```bash
-ng serve
-```
+Le skill, ses références de règles, son scanner et ses évaluations vivent dans le dépôt compagnon [`PrincyExaltIT/skill-issue`](https://github.com/PrincyExaltIT/skill-issue).
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+## L'application
 
-## Code scaffolding
+Conf Planner affiche le programme d'une conférence tech fictive (données dans `public/data`) :
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+- programme filtrable par texte (sans tenir compte des accents) et par track ;
+- favoris persistés dans le navigateur, avec un compteur dans l'en-tête et une page « Mes favoris » ;
+- page de détail d'un talk et de son speaker.
 
-```bash
-ng generate component component-name
-```
+Ce que `main` illustre :
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+| Sujet | Où regarder |
+|---|---|
+| Composants standalone, OnPush par défaut (v22), zoneless, control flow `@if` / `@for` | `src/app/talks/` |
+| `input()`, `input.required()`, `output()`, `computed()`, métadonnées `host` | `talk-card.ts`, `talk-list.ts` |
+| `httpResource()` et `InjectionToken` `API_BASE_URL` (pas d'URL en dur) | `talks.store.ts`, `core/api-base-url.ts` |
+| Signal privé exposé en lecture seule, mises à jour immuables, `effect()` limité à un effet de bord | `favorites/favorites.store.ts` |
+| Routes lazy (`loadComponent`) et `withComponentInputBinding()` | `app.routes.ts`, `talk-detail.ts` |
+| Accessibilité : labels, `aria-pressed`, `ariaCurrentWhenActive`, focus après navigation | `talk-list.html`, `app.html`, `app.ts` |
+| Tests Vitest qui testent un comportement (`setInput`, `HttpTestingController`) | `*.spec.ts` |
 
-```bash
-ng generate --help
-```
+## Démarrer
 
-## Building
-
-To build the project run:
-
-```bash
-ng build
-```
-
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
+Prérequis : **Node.js >= 24.15** (exigé par Angular 22) et npm.
 
 ```bash
-ng test
+npm install
+npm start                    # http://localhost:4200
+npm test                     # Vitest en mode watch
+npm test -- --watch=false    # une seule exécution (CI)
+npm run build                # build de production dans dist/
 ```
 
-## Running end-to-end tests
+## Le lab
 
-For end-to-end (e2e) testing, run:
+1. Placez-vous sur la pull request à reviewer :
+
+   ```bash
+   git checkout feat/speaker-spotlight
+   ```
+
+   Elle ajoute une page « speaker spotlight » (`/speakers/:id`) et un formulaire de proposition de talk (`/proposals`). Elle compile, mais elle n'est pas prête à merger.
+
+2. Lancez le skill `angular-review` sur la branche (base : `main`) :
+
+   - **Claude Code** : `/angular-review`
+   - **Codex** : `$angular-review`
+   - **autre harness compatible Agent Skills** : « review this branch with the angular-review skill »
+
+3. Lisez le rapport : `.review/REVIEW.md` (plus `.review/findings.json` pour les outils). Le dossier `.review/` est ignoré par git.
+
+4. Confrontez le rapport au code : chaque finding cite une ligne. Qu'est-ce que l'agent a trouvé, raté, ou signalé à tort ?
+
+Pour voir uniquement l'étape mécanique (sans LLM), avec les deux dépôts clonés côte à côte :
 
 ```bash
-ng e2e
+node ../skill-issue/skills/angular-review/scripts/scan.mjs --base main --format text
 ```
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+Le scanner ne fait que proposer des candidats, sur les lignes modifiées. Tout ce qui demande du jugement (contexte, intention, conséquence réelle) revient aux reviewers du skill : comparez les deux sorties.
