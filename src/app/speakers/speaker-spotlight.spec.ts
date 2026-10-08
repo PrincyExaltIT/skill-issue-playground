@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { RouterTestingHarness } from '@angular/router/testing';
-import { EMPTY, of } from 'rxjs';
+import { EMPTY, Observable, Subject, of } from 'rxjs';
 import { Speaker } from '../talks/talk.model';
 import { CAMILLE, SPEAKERS, TALKS } from '../talks/testing/talk-fixtures';
 import { SpeakerSpotlight } from './speaker-spotlight';
@@ -10,22 +10,20 @@ import { SpeakerService } from './speaker.service';
 describe('SpeakerSpotlight', () => {
   let component: SpeakerSpotlight;
   let fixture: ComponentFixture<SpeakerSpotlight>;
+  let harness: RouterTestingHarness;
 
-  /** Speakers connus de l'API simulée ; un test peut en remplacer le contenu. */
-  let apiSpeakers: Speaker[];
+  /** Réponses de l'API simulée par id ; un test peut en remplacer une (réponse lente, contenu piégé…). */
+  let speakerResponses: Map<string, Observable<Speaker>>;
 
   /** Faux SpeakerService : un id inconnu n'émet rien, la page reste en chargement. */
   const speakerService = {
-    getSpeaker: vi.fn((id: string) => {
-      const speaker = apiSpeakers.find((candidate) => candidate.id === id);
-      return speaker ? of(speaker) : EMPTY;
-    }),
+    getSpeaker: vi.fn((id: string) => speakerResponses.get(id) ?? EMPTY),
     getTalks: vi.fn((speakerId: string) => of(TALKS.filter((talk) => talk.speakerId === speakerId))),
   };
 
   beforeEach(async () => {
     vi.clearAllMocks();
-    apiSpeakers = SPEAKERS;
+    speakerResponses = new Map(SPEAKERS.map((speaker) => [speaker.id, of(speaker)]));
     await TestBed.configureTestingModule({
       imports: [SpeakerSpotlight],
       providers: [
@@ -36,13 +34,24 @@ describe('SpeakerSpotlight', () => {
 
     fixture = TestBed.createComponent(SpeakerSpotlight);
     component = fixture.componentInstance;
+    harness = await RouterTestingHarness.create();
   });
 
   /** Ouvre la page comme le ferait le routeur, avec l'id dans l'URL. */
-  async function openSpeakerPage(id: string): Promise<HTMLElement> {
-    const harness = await RouterTestingHarness.create();
+  async function openSpeakerPage(id: string): Promise<void> {
     await harness.navigateByUrl(`/speakers/${id}`, SpeakerSpotlight);
+  }
+
+  function page(): HTMLElement {
     return harness.routeNativeElement as HTMLElement;
+  }
+
+  function heading(): string | undefined {
+    return page().querySelector('h1')?.textContent?.trim();
+  }
+
+  function talkTitles(): (string | undefined)[] {
+    return Array.from(page().querySelectorAll('.talk h3'), (title) => title.textContent?.trim());
   }
 
   it('should create', () => {
@@ -50,21 +59,35 @@ describe('SpeakerSpotlight', () => {
   });
 
   it("charge le speaker désigné par l'URL et ses talks", async () => {
-    const page = await openSpeakerPage('camille-laurent');
+    await openSpeakerPage('camille-laurent');
 
     expect(speakerService.getSpeaker).toHaveBeenCalledWith('camille-laurent');
-    expect(page.querySelector('h1')?.textContent?.trim()).toBe('Camille Laurent');
-    expect(Array.from(page.querySelectorAll('.talk h3'), (title) => title.textContent?.trim())).toEqual([
-      'Signals en production',
-      'Sécurité front : XSS et sanitizer',
-    ]);
+    expect(heading()).toBe('Camille Laurent');
+    expect(talkTitles()).toEqual(['Signals en production', 'Sécurité front : XSS et sanitizer']);
+  });
+
+  it('affiche le speaker quand la réponse arrive après le premier rendu', async () => {
+    const response = new Subject<Speaker>();
+    speakerResponses.set('camille-laurent', response);
+
+    await openSpeakerPage('camille-laurent');
+    expect(page().textContent).toContain('Chargement du speaker');
+
+    response.next(CAMILLE);
+    response.complete();
+    await harness.fixture.whenStable();
+
+    expect(heading()).toBe('Camille Laurent');
   });
 
   it("assainit la bio HTML venue de l'API", async () => {
-    apiSpeakers = [{ ...CAMILLE, bio: '<strong>Architecte</strong> <img src="x" onerror="alert(1)">' }];
+    speakerResponses.set(
+      'camille-laurent',
+      of({ ...CAMILLE, bio: '<strong>Architecte</strong> <img src="x" onerror="alert(1)">' }),
+    );
 
-    const page = await openSpeakerPage('camille-laurent');
-    const bio = page.querySelector('.spotlight__bio');
+    await openSpeakerPage('camille-laurent');
+    const bio = page().querySelector('.spotlight__bio');
 
     expect(bio?.querySelector('strong')?.textContent).toBe('Architecte');
     expect(bio?.querySelector('img')?.hasAttribute('onerror')).toBe(false);

@@ -8,6 +8,7 @@ import {
   OnInit,
   Output,
   inject,
+  signal,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, RouterLink } from '@angular/router';
@@ -25,7 +26,7 @@ export class SpeakerSpotlight implements OnInit {
   @Input() speakerId!: string;
   @Output() select = new EventEmitter<string>();
 
-  speaker: any;
+  readonly speaker = signal<any>(undefined);
   talks: any[] = [];
 
   private destroyRef = inject(DestroyRef);
@@ -37,7 +38,7 @@ export class SpeakerSpotlight implements OnInit {
     this.route.paramMap.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((params) => {
       const id = params.get('id') ?? this.speakerId;
       this.speakerService.getSpeaker(id).subscribe((speaker) => {
-        this.speaker = speaker;
+        this.speaker.set(speaker);
         this.speakerService.getTalks(speaker.id).subscribe((talks) => {
           this.talks = talks;
         });

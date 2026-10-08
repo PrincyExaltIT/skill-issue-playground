@@ -1,6 +1,6 @@
 <a class="back-link" routerLink="/">← Retour au programme</a>
 
-<section class="spotlight" *ngIf="speaker; else loading">
+<section class="spotlight" *ngIf="speaker() as speaker; else loading">
   <header class="spotlight__header">
     <img *ngIf="speaker.photoUrl" class="spotlight__photo" [src]="speaker.photoUrl" />
     <span *ngIf="!speaker.photoUrl" class="spotlight__initials">{{ getInitials(speaker.name) }}</span>
