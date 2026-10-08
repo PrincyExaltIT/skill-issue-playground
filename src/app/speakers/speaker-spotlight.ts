@@ -30,6 +30,7 @@ export class SpeakerSpotlight implements OnInit {
   readonly speaker = signal<any>(undefined);
   readonly talks = signal<any[]>([]);
   readonly loadError = signal(false);
+  readonly talksError = signal(false);
 
   private destroyRef = inject(DestroyRef);
   private route = inject(ActivatedRoute);
@@ -45,6 +46,7 @@ export class SpeakerSpotlight implements OnInit {
           this.speaker.set(undefined);
           this.talks.set([]);
           this.loadError.set(false);
+          this.talksError.set(false);
         }),
         // switchMap annule les requêtes de l'id précédent : une réponse lente ne peut plus l'emporter.
         switchMap((id) =>
@@ -56,7 +58,14 @@ export class SpeakerSpotlight implements OnInit {
           ),
         ),
         tap((speaker) => this.speaker.set(speaker)),
-        switchMap((speaker) => this.speakerService.getTalks(speaker.id)),
+        switchMap((speaker) =>
+          this.speakerService.getTalks(speaker.id).pipe(
+            catchError(() => {
+              this.talksError.set(true);
+              return EMPTY;
+            }),
+          ),
+        ),
         takeUntilDestroyed(this.destroyRef),
       )
       .subscribe((talks) => this.talks.set(talks));

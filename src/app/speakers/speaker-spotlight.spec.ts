@@ -131,6 +131,16 @@ describe('SpeakerSpotlight', () => {
     expect(page().textContent).not.toContain('Chargement du speaker');
   });
 
+  it('garde le speaker affiché et signale une erreur quand ses talks ne se chargent pas', async () => {
+    talkResponses.set('camille-laurent', throwError(() => new HttpErrorResponse({ status: 503 })));
+
+    await openSpeakerPage('camille-laurent');
+
+    expect(heading()).toBe('Camille Laurent');
+    expect(page().querySelector('[role="alert"]')?.textContent).toContain('Impossible de charger ses talks');
+    expect(talkTitles()).toEqual([]);
+  });
+
   it("assainit la bio HTML venue de l'API", async () => {
     speakerResponses.set(
       'camille-laurent',
