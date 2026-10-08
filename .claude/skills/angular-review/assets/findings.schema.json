@@ -1,0 +1,56 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/PrincyExaltIT/skill-issue/skills/angular-review/assets/findings.schema.json",
+  "title": "Angular review findings",
+  "description": "Hand-off contract between angular-review (writer), review-fix and pr-handoff (readers), and CI (report.mjs --format).",
+  "type": "object",
+  "required": ["version", "reviewedAt", "verdict", "summary", "findings"],
+  "properties": {
+    "version": { "const": 1 },
+    "reviewedAt": { "type": "string", "format": "date-time" },
+    "base": { "type": ["string", "null"] },
+    "head": { "type": ["string", "null"] },
+    "angular": { "type": ["string", "null"], "description": "Angular version detected by scope.mjs" },
+    "verdict": { "enum": ["request-changes", "approve-with-comments", "approve"] },
+    "summary": { "type": "string", "description": "2-4 sentences: what the change does and the overall risk." },
+    "findings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "rule", "severity", "confidence", "category", "file", "line", "title", "evidence", "why", "fix", "source", "status"],
+        "properties": {
+          "id": { "type": "string", "pattern": "^F-\\d{3}$" },
+          "rule": { "type": "string", "description": "Rule id from references/checklist.md (NG-XXX-000) or CUSTOM-<slug> for project rules." },
+          "severity": { "enum": ["blocker", "major", "minor", "nit"] },
+          "confidence": { "enum": ["high", "medium", "low"] },
+          "category": { "enum": ["signals", "rxjs", "templates", "change-detection", "di", "security", "a11y", "performance", "forms", "http", "routing", "testing", "typescript", "architecture", "spec"] },
+          "file": { "type": "string" },
+          "line": { "type": "integer", "minimum": 1 },
+          "endLine": { "type": "integer", "minimum": 1 },
+          "title": { "type": "string", "maxLength": 120 },
+          "evidence": { "type": "string", "description": "Exact excerpt copied from the file at file:line. report.mjs checks it." },
+          "why": { "type": "string", "description": "One or two sentences: the concrete consequence (bug, leak, XSS, perf), not a principle." },
+          "fix": { "type": "string", "description": "Concrete fix: code or precise steps. Migration schematic when one exists." },
+          "source": { "enum": ["scan", "judgment"] },
+          "status": { "enum": ["open", "fixed", "wontfix"] },
+          "note": { "type": "string", "description": "Filled by review-fix: commit, reason for wontfix, etc." }
+        }
+      }
+    },
+    "dismissed": {
+      "type": "array",
+      "description": "Scan candidates rejected during verification, with the reason. Feeds evals (precision).",
+      "items": {
+        "type": "object",
+        "required": ["rule", "file", "line", "reason"],
+        "properties": {
+          "rule": { "type": "string" },
+          "file": { "type": "string" },
+          "line": { "type": "integer" },
+          "reason": { "type": "string" }
+        }
+      }
+    },
+    "praise": { "type": "array", "items": { "type": "string" }, "description": "Up to 3 things done well. Optional." }
+  }
+}

@@ -1,0 +1,54 @@
+# Include from your .gitlab-ci.yml:
+#   include:
+#     - local: kit/ci/gitlab/angular-review.gitlab-ci.yml   # or copy this file
+#
+# 1. angular-review:scan — deterministic, no AI. Produces a Code Quality report shown in the MR widget.
+# 2. angular-review:ai   — runs the full skill with Claude Code (headless) and posts REVIEW.md as an MR note.
+#    Runs only when ANTHROPIC_API_KEY and GITLAB_REVIEW_TOKEN (scope: api) are defined as masked CI/CD variables.
+# Prerequisite: the skill is versioned in the repo under .agents/skills/ (node kit/install.mjs --target .).
+
+stages: [review]
+
+.angular-review-base:
+  stage: review
+  image: node:24
+  variables:
+    GIT_DEPTH: 0          # scope.mjs needs the merge-base
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      changes: ["**/*.ts", "**/*.html", "angular.json", "package.json"]
+  before_script:
+    - git fetch --quiet origin "$CI_MERGE_REQUEST_TARGET_BRANCH_NAME"
+
+angular-review:scan:
+  extends: .angular-review-base
+  script:
+    - node .agents/skills/angular-review/scripts/scope.mjs --committed --quiet
+    - node .agents/skills/angular-review/scripts/scan.mjs --format text
+    - node .agents/skills/angular-review/scripts/scan.mjs --format gitlab --out gl-code-quality-report.json --fail-on BLOCKER --fail-confidence high
+  artifacts:
+    when: always
+    reports:
+      codequality: gl-code-quality-report.json
+    paths: [.review/scan.json]
+
+angular-review:ai:
+  extends: .angular-review-base
+  needs: ["angular-review:scan"]
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $ANTHROPIC_API_KEY && $GITLAB_REVIEW_TOKEN
+  script:
+    - npm install -g @anthropic-ai/claude-code
+    - mkdir -p .claude && cp -r .agents/skills .claude/skills   # Claude Code reads .claude/skills
+    - >
+      claude -p "Use the angular-review skill on this merge request. Base: origin/$CI_MERGE_REQUEST_TARGET_BRANCH_NAME
+      (run scope.mjs with --committed). Application code is read-only."
+      --allowedTools "Bash(node:*) Bash(git:*) Read Grep Glob Write"
+    - >
+      curl --fail --silent --show-error --request POST
+      --header "PRIVATE-TOKEN: $GITLAB_REVIEW_TOKEN"
+      --data-urlencode "body@.review/REVIEW.md"
+      "$CI_API_V4_URL/projects/$CI_PROJECT_ID/merge_requests/$CI_MERGE_REQUEST_IID/notes"
+  artifacts:
+    when: always
+    paths: [.review/]

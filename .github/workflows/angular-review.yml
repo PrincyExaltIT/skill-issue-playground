@@ -1,0 +1,79 @@
+# .github/workflows/angular-review.yml
+# Two jobs, two promises:
+#   1. scan  — deterministic, no AI, no secret. Annotates the PR diff and uploads SARIF. Fails only on high-confidence BLOCKERs.
+#   2. ai-review — runs the full angular-review skill with Claude Code, then posts .review/REVIEW.md as a PR comment.
+#      Skipped automatically when the ANTHROPIC_API_KEY secret is not configured.
+# Prerequisite: the skill is versioned in the repo (node kit/install.mjs --target . --harness claude,agents).
+
+name: angular-review
+
+on:
+  pull_request:
+    paths: ['**/*.ts', '**/*.html', 'angular.json', 'package.json', 'tsconfig*.json']
+
+permissions:
+  contents: read
+
+concurrency:
+  group: angular-review-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  scan:
+    name: Scan déterministe (sans IA)
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write   # SARIF upload (code scanning)
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0       # scope.mjs needs the merge-base with the target branch
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Scope + scan (annotations sur le diff)
+        run: |
+          node .agents/skills/angular-review/scripts/scope.mjs --committed --quiet
+          node .agents/skills/angular-review/scripts/scan.mjs --format github
+      - name: Gate (BLOCKER de confiance haute uniquement)
+        run: node .agents/skills/angular-review/scripts/scan.mjs --format sarif --out angular-review.sarif --fail-on BLOCKER --fail-confidence high
+      - name: Upload SARIF
+        if: always()
+        continue-on-error: true   # code scanning on a private repo needs GitHub Advanced Security
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: angular-review.sarif
+          category: angular-review
+
+  ai-review:
+    name: Review IA (skill angular-review)
+    needs: scan
+    if: ${{ !cancelled() }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write     # post the report as a PR comment
+    env:
+      HAS_KEY: ${{ secrets.ANTHROPIC_API_KEY != '' }}
+    steps:
+      - if: env.HAS_KEY != 'true'
+        run: echo "ANTHROPIC_API_KEY absent — review IA ignorée (le scan déterministe a tourné)."
+      - if: env.HAS_KEY == 'true'
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - if: env.HAS_KEY == 'true'
+        uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          prompt: |
+            Use the angular-review skill on this pull request.
+            Base branch: origin/${{ github.base_ref }} (run scope.mjs with --committed --base origin/${{ github.base_ref }}).
+            Application code is read-only. When .review/REVIEW.md is rendered, post it as ONE comment:
+            gh pr comment ${{ github.event.pull_request.number }} --body-file .review/REVIEW.md
+          claude_args: >-
+            --allowedTools "Bash(node:*),Bash(git:*),Bash(gh pr comment:*),Read,Grep,Glob,Write"
+
+# Variante Codex : remplacer l'étape claude-code-action par openai/codex-action (clé OPENAI_API_KEY),
+# avec le même prompt — le skill est lu depuis .agents/skills/ par Codex. Voir kit/README.md.

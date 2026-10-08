@@ -1,0 +1,3 @@
+interface:
+  display_name: "Review Fix"
+  short_description: "Fix angular-review findings one at a time"

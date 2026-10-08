@@ -1,0 +1,5 @@
+interface:
+  display_name: "PR Handoff"
+  short_description: "PR/MR description and handoff note from the branch facts"
+policy:
+  allow_implicit_invocation: false
