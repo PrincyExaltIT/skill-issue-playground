@@ -17,7 +17,7 @@ describe('SpeakerSpotlight', () => {
     component = fixture.componentInstance;
   });
 
-  it.only('should create', () => {
+  it('should create', () => {
     expect(component).toBeTruthy();
   });
 });
