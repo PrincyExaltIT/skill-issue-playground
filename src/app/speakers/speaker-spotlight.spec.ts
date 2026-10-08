@@ -2,8 +2,8 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { RouterTestingHarness } from '@angular/router/testing';
 import { EMPTY, Observable, Subject, of } from 'rxjs';
-import { Speaker } from '../talks/talk.model';
-import { CAMILLE, SPEAKERS, TALKS } from '../talks/testing/talk-fixtures';
+import { Speaker, Talk } from '../talks/talk.model';
+import { CAMILLE, SIGNALS_TALK, SPEAKERS, TALKS } from '../talks/testing/talk-fixtures';
 import { SpeakerSpotlight } from './speaker-spotlight';
 import { SpeakerService } from './speaker.service';
 
@@ -14,16 +14,20 @@ describe('SpeakerSpotlight', () => {
 
   /** Réponses de l'API simulée par id ; un test peut en remplacer une (réponse lente, contenu piégé…). */
   let speakerResponses: Map<string, Observable<Speaker>>;
+  let talkResponses: Map<string, Observable<Talk[]>>;
 
   /** Faux SpeakerService : un id inconnu n'émet rien, la page reste en chargement. */
   const speakerService = {
     getSpeaker: vi.fn((id: string) => speakerResponses.get(id) ?? EMPTY),
-    getTalks: vi.fn((speakerId: string) => of(TALKS.filter((talk) => talk.speakerId === speakerId))),
+    getTalks: vi.fn((speakerId: string) => talkResponses.get(speakerId) ?? EMPTY),
   };
 
   beforeEach(async () => {
     vi.clearAllMocks();
     speakerResponses = new Map(SPEAKERS.map((speaker) => [speaker.id, of(speaker)]));
+    talkResponses = new Map(
+      SPEAKERS.map((speaker) => [speaker.id, of(TALKS.filter((talk) => talk.speakerId === speaker.id))]),
+    );
     await TestBed.configureTestingModule({
       imports: [SpeakerSpotlight],
       providers: [
@@ -78,6 +82,20 @@ describe('SpeakerSpotlight', () => {
     await harness.fixture.whenStable();
 
     expect(heading()).toBe('Camille Laurent');
+  });
+
+  it('affiche les talks quand ils arrivent après le speaker', async () => {
+    const talks = new Subject<Talk[]>();
+    talkResponses.set('camille-laurent', talks);
+
+    await openSpeakerPage('camille-laurent');
+    expect(talkTitles()).toEqual([]);
+
+    talks.next([SIGNALS_TALK]);
+    talks.complete();
+    await harness.fixture.whenStable();
+
+    expect(talkTitles()).toEqual(['Signals en production']);
   });
 
   it("assainit la bio HTML venue de l'API", async () => {

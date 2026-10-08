@@ -27,7 +27,7 @@ export class SpeakerSpotlight implements OnInit {
   @Output() select = new EventEmitter<string>();
 
   readonly speaker = signal<any>(undefined);
-  talks: any[] = [];
+  readonly talks = signal<any[]>([]);
 
   private destroyRef = inject(DestroyRef);
   private route = inject(ActivatedRoute);
@@ -40,7 +40,7 @@ export class SpeakerSpotlight implements OnInit {
       this.speakerService.getSpeaker(id).subscribe((speaker) => {
         this.speaker.set(speaker);
         this.speakerService.getTalks(speaker.id).subscribe((talks) => {
-          this.talks = talks;
+          this.talks.set(talks);
         });
       });
     });
@@ -55,6 +55,6 @@ export class SpeakerSpotlight implements OnInit {
   }
 
   addAllToFavorites(): void {
-    this.talks.forEach((talk) => this.favorites.add(talk.id));
+    this.talks().forEach((talk) => this.favorites.add(talk.id));
   }
 }
