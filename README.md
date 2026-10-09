@@ -1,70 +1,70 @@
 # Conf Planner
 
-Application de démonstration de la formation **« Skill Issue »** (Agent Skills et code review Angular).
+Le terrain d'entraînement de la formation **« Skill Issue : construis ton skill de code review »**.
 
-Ce dépôt est la **cible du skill `angular-review`** :
+Tu vas écrire ton propre skill de review Angular, le lancer sur une vraie pull request et mesurer ce qu'il trouve, ce qu'il rate et ce qu'il signale à tort. Puis tu le partageras à toute l'équipe en le commitant ici.
 
-- la branche `main` est une petite application Angular 22 idiomatique, celle qu'une review exigeante doit laisser passer ;
-- la branche `feat/speaker-spotlight` est une pull request écrite dans l'urgence, avec des défauts à trouver. C'est le terrain du lab.
+La formation, le skill de référence étape par étape, le corrigé et le package prêt à l'emploi vivent dans le dépôt compagnon [`PrincyExaltIT/skill-issue`](https://github.com/PrincyExaltIT/skill-issue).
 
-Le skill, ses références de règles, son scanner et ses évaluations vivent dans le dépôt compagnon [`PrincyExaltIT/skill-issue`](https://github.com/PrincyExaltIT/skill-issue).
+## Les branches
 
-## L'application
-
-Conf Planner affiche le programme d'une conférence tech fictive (données dans `public/data`) :
-
-- programme filtrable par texte (sans tenir compte des accents) et par track ;
-- favoris persistés dans le navigateur, avec un compteur dans l'en-tête et une page « Mes favoris » ;
-- page de détail d'un talk et de son speaker.
-
-Ce que `main` illustre :
-
-| Sujet | Où regarder |
-|---|---|
-| Composants standalone, OnPush par défaut (v22), zoneless, control flow `@if` / `@for` | `src/app/talks/` |
-| `input()`, `input.required()`, `output()`, `computed()`, métadonnées `host` | `talk-card.ts`, `talk-list.ts` |
-| `httpResource()` et `InjectionToken` `API_BASE_URL` (pas d'URL en dur) | `talks.store.ts`, `core/api-base-url.ts` |
-| Signal privé exposé en lecture seule, mises à jour immuables, `effect()` limité à un effet de bord | `favorites/favorites.store.ts` |
-| Routes lazy (`loadComponent`) et `withComponentInputBinding()` | `app.routes.ts`, `talk-detail.ts` |
-| Accessibilité : labels, `aria-pressed`, `ariaCurrentWhenActive`, focus après navigation | `talk-list.html`, `app.html`, `app.ts` |
-| Tests Vitest qui testent un comportement (`setInput`, `HttpTestingController`) | `*.spec.ts` |
+| Branche | Rôle | Quand |
+|---|---|---|
+| `main` | Le point de départ : l'application, ses conventions (`AGENTS.md`), aucun skill | Module 1 |
+| `feat/speaker-spotlight` | La pull request à relire, écrite dans l'urgence, avec des défauts à trouver (PR #1) | Modules 1 et 2 |
+| `equipe/main` | Après le module 2 : le skill `revue-angular` commité pour toute l'équipe, avec sa CI | Bonus cloud |
+| `equipe/speaker-spotlight` | La même PR, relue en CI par le skill de l'équipe (PR #3) | Bonus cloud |
+| `package/main` | Le package de Princy installé, avec sa CI | Bonus package |
+| `package/speaker-spotlight` | La même PR, relue par le package (PR #4) | Bonus package |
+| `solution/review-fix` | 21 corrections faites par la chaîne du package (PR #2) | Bonus package |
 
 ## Démarrer
 
-Prérequis : **Node.js >= 24.15** (exigé par Angular 22) et npm.
+Prérequis : **Node.js 24.15 ou plus** (exigé par Angular 22), git, et au moins un harness compatible Agent Skills (Claude Code, Codex, Copilot, Cursor, Gemini CLI / Antigravity, OpenCode, Kilo Code, Continue).
 
 ```bash
+git clone https://github.com/PrincyExaltIT/skill-issue-playground.git
+git clone https://github.com/PrincyExaltIT/skill-issue.git        # à côté : corrigé, score, rattrapage
+cd skill-issue-playground
 npm install
-npm start                    # http://localhost:4200
-npm test                     # Vitest en mode watch
-npm test -- --watch=false    # une seule exécution (CI)
-npm run build                # build de production dans dist/
+git checkout feat/speaker-spotlight
 ```
 
-## Le lab
+Ton skill se crée dans `.claude/skills/revue-angular/` (Claude Code, Continue) ou `.agents/skills/revue-angular/` (tous les autres). Il reste non suivi pendant que tu le construis : il te suit d'une branche à l'autre.
 
-1. Placez-vous sur la pull request à reviewer :
+## Mesurer ta review
 
-   ```bash
-   git checkout feat/speaker-spotlight
-   ```
-
-   Elle ajoute une page « speaker spotlight » (`/speakers/:id`) et un formulaire de proposition de talk (`/proposals`). Elle compile, mais elle n'est pas prête à merger.
-
-2. Lancez le skill `angular-review` sur la branche (base : `main`) :
-
-   - **Claude Code** : `/angular-review`
-   - **Codex** : `$angular-review`
-   - **autre harness compatible Agent Skills** : « review this branch with the angular-review skill »
-
-3. Lisez le rapport : `.review/REVIEW.md` (plus `.review/findings.json` pour les outils). Le dossier `.review/` est ignoré par git.
-
-4. Confrontez le rapport au code : chaque finding cite une ligne. Qu'est-ce que l'agent a trouvé, raté, ou signalé à tort ?
-
-Pour voir uniquement l'étape mécanique (sans LLM), avec les deux dépôts clonés côte à côte :
+Le corrigé de la PR est dans le dépôt compagnon, hors de portée de l'agent qui relit :
 
 ```bash
-node ../skill-issue/skills/angular-review/scripts/scan.mjs --base main --format text
+node ../skill-issue/evals/angular-review/score.mjs --report .review/REVIEW.md
 ```
 
-Le scanner ne fait que proposer des candidats, sur les lignes modifiées. Tout ce qui demande du jugement (contexte, intention, conséquence réelle) revient aux reviewers du skill : comparez les deux sorties.
+Une seule contrainte pour être mesuré : ta review cite chaque problème sous la forme `chemin/du/fichier.ts:ligne`.
+
+## Rattraper une étape
+
+```bash
+node ../skill-issue/course/rattrapage.mjs 2                # copie le skill de référence de l'étape 2
+node ../skill-issue/course/rattrapage.mjs 2 --harness codex   # dans .agents/skills/ au lieu de .claude/skills/
+```
+
+## L'application
+
+Conf Planner affiche le programme d'une conférence tech fictive (données dans `public/data`) : programme filtrable par texte et par track, favoris persistés dans le navigateur, page de détail d'un talk et de son speaker.
+
+| Ce que `main` illustre | Où regarder |
+|---|---|
+| Composants standalone, OnPush par défaut (v22), zoneless, control flow `@if` / `@for` | `src/app/talks/` |
+| `input()`, `input.required()`, `output()`, `computed()`, métadonnées `host` | `talk-card.ts`, `talk-list.ts` |
+| `httpResource()` et le token `API_BASE_URL` (pas d'URL en dur) | `talks.store.ts`, `core/api-base-url.ts` |
+| Signal privé exposé en lecture seule, mises à jour immuables, `effect()` limité à un effet de bord | `favorites/favorites.store.ts` |
+| Routes chargées à la demande (`loadComponent`) et `withComponentInputBinding()` | `app.routes.ts`, `talk-detail.ts` |
+| Accessibilité : labels, `aria-pressed`, `ariaCurrentWhenActive`, focus après navigation | `talk-list.html`, `app.html`, `app.ts` |
+| Tests Vitest qui testent un comportement (`setInput`, `HttpTestingController`) | `*.spec.ts` |
+
+```bash
+npm start                    # http://localhost:4200
+npm test -- --watch=false    # tests unitaires
+npm run build                # build de production
+```

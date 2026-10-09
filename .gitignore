@@ -43,5 +43,5 @@ __screenshots__/
 .DS_Store
 Thumbs.db
 
-# Rapports du skill angular-review (scope, scan, findings, REVIEW.md)
+# Rapports générés par les skills de revue
 .review/
