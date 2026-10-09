@@ -20,12 +20,13 @@ La formation, le skill de référence étape par étape, le corrigé et le packa
 
 ## Démarrer
 
-Prérequis : **Node.js 24.15 ou plus** (exigé par Angular 22), git, et au moins un harness compatible Agent Skills (Claude Code, Codex, Copilot, Cursor, Gemini CLI / Antigravity, OpenCode, Kilo Code, Continue).
+Prérequis : **Node.js 24.13.1 ou plus** (minimum d'Angular 22 ; 24.15 conseillé avec le CLI 22.2), git, et au moins un harness compatible Agent Skills (Claude Code, Codex, Copilot, Cursor, Gemini CLI / Antigravity, OpenCode, Kilo Code, Continue).
 
 ```bash
 git clone https://github.com/PrincyExaltIT/skill-issue-playground.git
 git clone https://github.com/PrincyExaltIT/skill-issue.git        # à côté : corrigé, score, rattrapage
 cd skill-issue-playground
+git checkout depart                 # la base de la PR, en local
 git checkout lab/speaker-spotlight
 npm install
 ```
