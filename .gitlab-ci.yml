@@ -2,6 +2,8 @@
 #   revue-angular:verifs : les scripts du skill, sans IA ni secret. Le job échoue sur un BLOCKER.
 #   revue-angular:ia     : le skill complet avec Claude Code (claude -p), puis le rapport en note de la MR.
 #                          Ne tourne que si les variables masquées ANTHROPIC_API_KEY et GITLAB_REVIEW_TOKEN existent.
+# Avec Codex, pas de job à écrire : l'intégration GitLab de Codex (bêta) relit la MR sur « @codex review » ou à
+# l'ouverture. Le job verifs, lui, reste le même quel que soit l'agent.
 # GitLab clone en profondeur limitée par défaut : GIT_DEPTH 0 donne l'ancêtre commun avec la branche cible.
 
 variables:

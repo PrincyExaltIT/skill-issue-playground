@@ -1,7 +1,10 @@
 # .github/workflows/revue-angular.yml — la revue de l'équipe sur chaque pull request.
 #   1. verifs    : les scripts du skill, sans IA ni secret. Annotations sur le diff, porte fermée sur un BLOCKER.
-#   2. revue-ia  : le skill complet avec Claude Code, puis le rapport en commentaire de la PR.
-#                  Sautée tant que le secret ANTHROPIC_API_KEY n'existe pas.
+#   2. revue-ia  : le même skill lancé par l'agent de ton équipe, puis le rapport en commentaire de la PR.
+#                  Deux variantes, chacune sautée tant que son secret n'existe pas : garde celle de ton équipe.
+#                  - revue-ia-claude : Claude Code (.claude/skills), secret ANTHROPIC_API_KEY
+#                  - revue-ia-codex  : Codex (.agents/skills), secret OPENAI_API_KEY
+#                  Dans les deux cas, c'est le workflow qui publie le commentaire, pas l'agent.
 # Prérequis : le skill est commité dans .agents/skills/revue-angular et .claude/skills/revue-angular.
 
 name: revue-angular
@@ -30,8 +33,8 @@ jobs:
           node .agents/skills/revue-angular/scripts/perimetre.mjs --base origin/${{ github.base_ref }}
           node .agents/skills/revue-angular/scripts/verifs.mjs --echec-sur BLOCKER
 
-  revue-ia:
-    name: Revue IA (skill revue-angular)
+  revue-ia-claude:
+    name: Revue IA · Claude Code (skill revue-angular)
     needs: verifs
     if: ${{ !cancelled() }}     # la revue tourne aussi quand la porte est fermée : c'est là qu'elle sert
     runs-on: ubuntu-latest
@@ -56,6 +59,36 @@ jobs:
             /revue-angular Relis cette PR avant qu'elle soit mergée sur ${{ github.base_ref }} (base : origin/${{ github.base_ref }}).
           claude_args: >-
             --allowedTools "Bash(git:*),Bash(node:*),Read,Grep,Glob,Write"
+      - if: env.HAS_KEY == 'true'
+        name: Publier le rapport
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh pr comment ${{ github.event.pull_request.number }} --body-file .review/REVIEW.md
+
+  revue-ia-codex:
+    name: Revue IA · Codex (skill revue-angular)
+    needs: verifs
+    if: ${{ !cancelled() }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write      # publier le rapport en commentaire
+    env:
+      HAS_KEY: ${{ secrets.OPENAI_API_KEY != '' }}
+    steps:
+      - if: env.HAS_KEY != 'true'
+        run: echo "Pas de secret OPENAI_API_KEY, donc pas de revue IA Codex. Les vérifications sans IA ont tourné."
+      - if: env.HAS_KEY == 'true'
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - if: env.HAS_KEY == 'true'
+        uses: openai/codex-action@v1
+        with:
+          openai-api-key: ${{ secrets.OPENAI_API_KEY }}
+          permission-profile: ':workspace'   # le skill écrit .review/ dans le checkout
+          prompt: |
+            $revue-angular Relis cette PR avant qu'elle soit mergée sur ${{ github.base_ref }} (base : origin/${{ github.base_ref }}).
       - if: env.HAS_KEY == 'true'
         name: Publier le rapport
         env:
