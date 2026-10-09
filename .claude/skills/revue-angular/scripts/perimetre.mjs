@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 // Périmètre de la revue : les fichiers modifiés par la branche et leurs lignes ajoutées ou modifiées.
-//   node scripts/perimetre.mjs [--base main]      en CI : --base origin/<branche cible>
+//   node scripts/perimetre.mjs [--base <branche>] sans --base : la branche par défaut du dépôt (origin/HEAD), sinon main
+//                                                 en CI : --base origin/<branche cible>
 //   node scripts/perimetre.mjs --travail          ajoute le travail non commité (pour un hook, ou avant de commiter)
 // Écrit .review/perimetre.json à la racine du dépôt. Les dossiers d'outillage (.claude, .agents, .review) sont exclus.
 
@@ -14,7 +15,8 @@ const git = (...a) => execFileSync('git', a, { encoding: 'utf8', maxBuffer: 64 *
 const racine = git('rev-parse', '--show-toplevel').trim();
 // Dans un clone neuf, la branche de base n'existe souvent que sur le remote : origin/<base> fait l'affaire.
 const existe = (ref) => { try { git('rev-parse', '--verify', '--quiet', ref); return true; } catch { return false; } };
-const demandee = args.includes('--base') ? args[args.indexOf('--base') + 1] : 'main';
+const parDefaut = () => { try { return git('symbolic-ref', '--quiet', '--short', 'refs/remotes/origin/HEAD').trim().replace(/^origin\//, ''); } catch { return 'main'; } };
+const demandee = args.includes('--base') ? args[args.indexOf('--base') + 1] : parDefaut();
 const base = existe(demandee) || !existe(`origin/${demandee}`) ? demandee : `origin/${demandee}`;
 // Depuis le point où la branche a quitté la base : jusqu'au dernier commit, ou jusqu'aux fichiers sur le disque.
 const plage = travail ? ['--merge-base', base] : [`${base}...HEAD`];
