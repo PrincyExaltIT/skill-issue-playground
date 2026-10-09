@@ -2,8 +2,8 @@
 // Vérifications mécaniques sur les lignes du périmètre. Elles produisent des PISTES : rapides, répétables, mais
 // c'est la revue qui confirme ou écarte chacune en lisant le code.
 //   node scripts/verifs.mjs                      après scripts/perimetre.mjs
-//   node scripts/verifs.mjs --echec-sur BLOCKER  porte de CI : code de sortie 1 si une piste atteint cette gravité
-// Écrit .review/verifs.json et affiche une piste par ligne : fichier:ligne [règle] gravité — message.
+//   node scripts/verifs.mjs --echec-sur BLOCKER  porte (CI, hook) : n'affiche que les pistes de ce seuil ou plus graves, code 1 s'il y en a
+// Écrit toutes les pistes dans .review/verifs.json et affiche une piste par ligne : fichier:ligne [règle] gravité — message.
 
 import { execFileSync } from 'node:child_process';
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
@@ -47,6 +47,10 @@ const REGLES = [
 
 const args = process.argv.slice(2);
 const seuil = args.includes('--echec-sur') ? args[args.indexOf('--echec-sur') + 1] : null;
+if (seuil && !GRAVITES.includes(seuil)) {
+  console.error(`--echec-sur ${seuil} : gravité inconnue (${GRAVITES.join(', ')}).`);
+  process.exit(2);
+}
 const racine = execFileSync('git', ['rev-parse', '--show-toplevel'], { encoding: 'utf8' }).trim();
 const cheminPerimetre = join(racine, '.review', 'perimetre.json');
 if (!existsSync(cheminPerimetre)) {
@@ -80,16 +84,20 @@ for (const f of fichiers) {
 
 pistes.sort((a, b) => GRAVITES.indexOf(a.gravite) - GRAVITES.indexOf(b.gravite) || a.fichier.localeCompare(b.fichier) || a.ligne - b.ligne);
 writeFileSync(join(racine, '.review', 'verifs.json'), JSON.stringify(pistes, null, 2));
-for (const p of pistes) console.log(`${p.fichier}:${p.ligne} [${p.regle}] ${p.gravite} — ${p.message}`);
-console.log(`${pistes.length} piste(s) → .review/verifs.json`);
+// Avec un seuil, seules les pistes qui ferment la porte s'affichent : un hook bavard pollue chaque tour de l'agent.
+const bloquantes = seuil ? pistes.filter((p) => GRAVITES.indexOf(p.gravite) <= GRAVITES.indexOf(seuil)) : pistes;
+for (const p of bloquantes) console.log(`${p.fichier}:${p.ligne} [${p.regle}] ${p.gravite} — ${p.message}`);
+console.log(seuil
+  ? `${bloquantes.length} piste(s) ${seuil} ou plus grave, sur ${pistes.length} → .review/verifs.json`
+  : `${pistes.length} piste(s) → .review/verifs.json`);
 
-// En GitHub Actions, chaque piste devient aussi une annotation sur le diff de la PR.
+// En GitHub Actions, chaque piste (seuil ou pas) devient aussi une annotation sur le diff de la PR.
 if (process.env.GITHUB_ACTIONS === 'true') {
   const niveau = { BLOCKER: 'error', MAJOR: 'warning', MINOR: 'notice', INFO: 'notice' };
   for (const p of pistes) console.log(`::${niveau[p.gravite]} file=${p.fichier},line=${p.ligne},title=${p.regle}::${p.message}`);
 }
 
-if (seuil && pistes.some((p) => GRAVITES.indexOf(p.gravite) <= GRAVITES.indexOf(seuil))) {
+if (seuil && bloquantes.length) {
   console.error(`Porte fermée : au moins une piste ${seuil} ou plus grave.`);
   process.exit(1);
 }

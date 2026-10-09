@@ -1,0 +1,7 @@
+# Extension propre à Codex : ignorée par les autres harnesses.
+# Corriger est une décision : le skill ne part que sur $corrige-review, jamais de lui-même.
+interface:
+  display_name: "Corrige la review"
+  short_description: "Corrige les findings de .review/REVIEW.md, un commit par finding"
+policy:
+  allow_implicit_invocation: false

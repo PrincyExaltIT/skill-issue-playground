@@ -47,7 +47,7 @@ En Angular 22, les composants sont standalone, OnPush est le mode par défaut et
 **Correction** : `inject(FormBuilder).nonNullable.group({ … })`, ou `form()` de Signal Forms.
 
 ### NG-10 · Guard ou resolver écrit en classe — MINOR
-**Pourquoi** : les interfaces `CanActivate`, `CanMatch`, `Resolve` en classe sont dépréciées ; une fonction est plus courte et se teste seule.
+**Pourquoi** : les guards en classe ne sont pas dépréciés, mais la forme fonction est l'idiome actuel : plus courte, sans classe à injecter, testable seule. À signaler sur du code neuf, pas comme une migration obligatoire.
 **À repérer** : `implements CanActivate`, `implements Resolve`.
 **Correction** : `export const proposalsOpen: CanActivateFn = () => …`
 

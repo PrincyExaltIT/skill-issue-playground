@@ -9,10 +9,13 @@ import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 const args = process.argv.slice(2);
-const base = args.includes('--base') ? args[args.indexOf('--base') + 1] : 'main';
 const travail = args.includes('--travail');
 const git = (...a) => execFileSync('git', a, { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 });
 const racine = git('rev-parse', '--show-toplevel').trim();
+// Dans un clone neuf, la branche de base n'existe souvent que sur le remote : origin/<base> fait l'affaire.
+const existe = (ref) => { try { git('rev-parse', '--verify', '--quiet', ref); return true; } catch { return false; } };
+const demandee = args.includes('--base') ? args[args.indexOf('--base') + 1] : 'main';
+const base = existe(demandee) || !existe(`origin/${demandee}`) ? demandee : `origin/${demandee}`;
 // Depuis le point où la branche a quitté la base : jusqu'au dernier commit, ou jusqu'aux fichiers sur le disque.
 const plage = travail ? ['--merge-base', base] : [`${base}...HEAD`];
 const exclus = ['--', '.', ':!.claude', ':!.agents', ':!.review'];
