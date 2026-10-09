@@ -1,0 +1,28 @@
+{
+  "skill": "revue-angular",
+  "notes": "Chaque prompt est rejoué 3 fois en headless ; il compte comme déclenché si le skill est chargé au moins 2 fois sur 3. Cible : au moins 90 % de bonnes réponses sur chaque liste. Les quasi-positifs (React, description de PR, correction d'un test) sont là pour attraper une description trop large.",
+  "doit_declencher": [
+    "Relis ma branche avant que je la merge sur main",
+    "Tu peux faire une review de la PR 42 ?",
+    "Vérifie ce que j'ai changé dans le composant speaker avant la MR",
+    "Est-ce que ce diff Angular est prêt à merger ?",
+    "Fais une revue de code de mes changements",
+    "Audit rapide de ma branche avant la démo de demain",
+    "Regarde si mes modifs respectent les conventions de l'équipe",
+    "Review this branch before I merge it",
+    "Passe la MR 17 au crible",
+    "Quelqu'un peut relire ce que j'ai fait sur le formulaire de proposition ?"
+  ],
+  "ne_doit_pas_declencher": [
+    "Crée-moi un composant Angular de liste de talks",
+    "Explique-moi la différence entre signal et computed",
+    "Corrige le test qui échoue dans talk-card.spec.ts",
+    "Migre ce composant vers le control flow natif",
+    "Écris la description de ma PR",
+    "Review mon composant React",
+    "Ajoute un champ email au formulaire",
+    "Pourquoi j'ai l'erreur NG0203 ?",
+    "Mets à jour le projet vers la dernière version d'Angular",
+    "Fais un résumé du README"
+  ]
+}

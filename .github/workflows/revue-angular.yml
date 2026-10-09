@@ -1,0 +1,63 @@
+# .github/workflows/revue-angular.yml — la revue de l'équipe sur chaque pull request.
+#   1. verifs    : les scripts du skill, sans IA ni secret. Annotations sur le diff, porte fermée sur un BLOCKER.
+#   2. revue-ia  : le skill complet avec Claude Code, puis le rapport en commentaire de la PR.
+#                  Sautée tant que le secret ANTHROPIC_API_KEY n'existe pas.
+# Prérequis : le skill est commité dans .agents/skills/revue-angular et .claude/skills/revue-angular.
+
+name: revue-angular
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  verifs:
+    name: Vérifications sans IA
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0          # le périmètre a besoin de l'ancêtre commun avec la branche cible
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+      - name: Les deux copies du skill sont identiques
+        run: diff -r .agents/skills/revue-angular .claude/skills/revue-angular
+      - name: Périmètre et vérifications (porte sur les BLOCKER)
+        run: |
+          node .agents/skills/revue-angular/scripts/perimetre.mjs --base origin/${{ github.base_ref }}
+          node .agents/skills/revue-angular/scripts/verifs.mjs --echec-sur BLOCKER
+
+  revue-ia:
+    name: Revue IA (skill revue-angular)
+    needs: verifs
+    if: ${{ !cancelled() }}     # la revue tourne aussi quand la porte est fermée : c'est là qu'elle sert
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write      # publier le rapport en commentaire
+      id-token: write           # authentification de claude-code-action
+    env:
+      HAS_KEY: ${{ secrets.ANTHROPIC_API_KEY != '' }}
+    steps:
+      - if: env.HAS_KEY != 'true'
+        run: echo "Pas de secret ANTHROPIC_API_KEY, donc pas de revue IA. Les vérifications sans IA ont tourné."
+      - if: env.HAS_KEY == 'true'
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - if: env.HAS_KEY == 'true'
+        uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          prompt: |
+            /revue-angular Relis cette PR avant qu'elle soit mergée sur ${{ github.base_ref }} (base : origin/${{ github.base_ref }}).
+          claude_args: >-
+            --allowedTools "Bash(git:*),Bash(node:*),Read,Grep,Glob,Write"
+      - if: env.HAS_KEY == 'true'
+        name: Publier le rapport
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh pr comment ${{ github.event.pull_request.number }} --body-file .review/REVIEW.md

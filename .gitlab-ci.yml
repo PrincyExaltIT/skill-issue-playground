@@ -1,0 +1,33 @@
+# .gitlab-ci.yml — la revue de l'équipe sur chaque merge request.
+#   revue-angular:verifs : les scripts du skill, sans IA ni secret. Le job échoue sur un BLOCKER.
+#   revue-angular:ia     : le skill complet avec Claude Code (claude -p), puis le rapport en note de la MR.
+#                          Ne tourne que si les variables masquées ANTHROPIC_API_KEY et GITLAB_REVIEW_TOKEN existent.
+# GitLab clone en profondeur limitée par défaut : GIT_DEPTH 0 donne l'ancêtre commun avec la branche cible.
+
+variables:
+  GIT_DEPTH: "0"
+
+revue-angular:verifs:
+  image: node:24
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+  script:
+    - git fetch origin "$CI_MERGE_REQUEST_TARGET_BRANCH_NAME"
+    - node .agents/skills/revue-angular/scripts/perimetre.mjs --base "origin/$CI_MERGE_REQUEST_TARGET_BRANCH_NAME"
+    - node .agents/skills/revue-angular/scripts/verifs.mjs --echec-sur BLOCKER
+
+revue-angular:ia:
+  image: node:24
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $ANTHROPIC_API_KEY && $GITLAB_REVIEW_TOKEN
+  script:
+    - npm install -g @anthropic-ai/claude-code
+    - git fetch origin "$CI_MERGE_REQUEST_TARGET_BRANCH_NAME"
+    - >
+      claude -p "/revue-angular Relis cette MR avant qu'elle soit mergée sur $CI_MERGE_REQUEST_TARGET_BRANCH_NAME (base : origin/$CI_MERGE_REQUEST_TARGET_BRANCH_NAME)."
+      --permission-mode acceptEdits
+      --allowedTools "Bash(git:*)" "Bash(node:*)" Read Grep Glob Write
+    - >
+      curl --fail --request POST --header "PRIVATE-TOKEN: $GITLAB_REVIEW_TOKEN"
+      --data-urlencode "body@.review/REVIEW.md"
+      "$CI_API_V4_URL/projects/$CI_PROJECT_ID/merge_requests/$CI_MERGE_REQUEST_IID/notes"

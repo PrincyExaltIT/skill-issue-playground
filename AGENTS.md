@@ -20,6 +20,10 @@ Conf Planner, application Angular 22 de démonstration. Ce fichier est chargé �
 - Un dossier par fonctionnalité (`src/app/<feature>/`), nommage 2025 (`talk-card.ts` contient `class TalkCard`).
 - Textes affichés en français ; code en anglais.
 
+## Skills
+
+- `revue-angular` : revue de code d'une branche, d'une PR ou d'une MR selon les règles de l'équipe. Les règles sont dans `references/` du skill ; le rapport sort dans `.review/REVIEW.md`. Le skill vit dans `.agents/skills/` et `.claude/skills/`, deux copies identiques.
+
 ## Limites
 
 - `.review/` est généré : il ne se commite pas.

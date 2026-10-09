@@ -1,0 +1,6 @@
+# Extension propre à Codex : ignorée par les autres harnesses.
+interface:
+  display_name: "Revue Angular"
+  short_description: "Relit un diff Angular selon les règles de l'équipe"
+policy:
+  allow_implicit_invocation: true
