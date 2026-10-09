@@ -51,7 +51,7 @@ node .agents/skills/angular-review/scripts/scan.mjs --base main --format text
 
 Conf Planner affiche le programme d'une conférence tech fictive (données dans `public/data`) : programme filtrable par texte et par track, favoris persistés dans le navigateur, page de détail d'un talk et de son speaker.
 
-Prérequis : **Node.js 24.13.1 ou plus** (minimum d'Angular 22 ; 24.15 conseillé avec le CLI 22.2) et npm.
+Prérequis : **Node.js 24.15 ou plus**, ou 22.22.3 ou plus (la CLI Angular 22.2 refuse de démarrer en dessous) et npm.
 
 ```bash
 npm install
