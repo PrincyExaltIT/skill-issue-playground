@@ -23,6 +23,8 @@ Conf Planner, application Angular 22 de démonstration. Ce fichier est chargé �
 ## Skills
 
 - `revue-angular` : revue de code d'une branche, d'une PR ou d'une MR selon les règles de l'équipe. Les règles sont dans `references/` du skill ; le rapport sort dans `.review/REVIEW.md`. Le skill vit dans `.agents/skills/` et `.claude/skills/`, deux copies identiques.
+- `corrige-review` : applique les findings de `.review/REVIEW.md`, un commit par finding, tests verts après chacun. S'invoque à la main.
+- `raconte-branche` : écrit la description de la PR dans `.review/PR.md` à partir des commits et de la review. S'invoque à la main.
 
 ## Limites
 
