@@ -1,80 +1,56 @@
 # Conf Planner
 
-Application de démonstration de la formation **« Skill Issue »** (Agent Skills et code review Angular).
+Le terrain d'entraînement de la formation **« Skill Issue : construis ton skill de code review »**.
 
-Ce dépôt est la **cible du skill `angular-review`** :
+> **Tu suis la formation ? Pars de la branche `depart`**, puis relis la PR de `lab/speaker-spotlight`. La branche `main`, celle-ci, contient le **package de Princy** déjà installé : c'est le bonus final, à ouvrir après avoir construit ton propre skill.
 
-- la branche `main` est une petite application Angular 22 idiomatique, celle qu'une review exigeante doit laisser passer ;
-- la branche `feat/speaker-spotlight` est une pull request écrite dans l'urgence, avec des défauts à trouver. C'est le terrain du lab.
+La formation, le skill de référence étape par étape, le corrigé et le package vivent dans le dépôt compagnon [`PrincyExaltIT/skill-issue`](https://github.com/PrincyExaltIT/skill-issue).
 
-Le skill, ses références de règles, son scanner et ses évaluations vivent dans le dépôt compagnon [`PrincyExaltIT/skill-issue`](https://github.com/PrincyExaltIT/skill-issue).
+## Les branches
 
-Le kit est **déjà installé** dans ce dépôt, comme le ferait une équipe : `.agents/skills/` (Codex, Copilot, Cursor, Gemini/Antigravity, OpenCode, Kilo Code) et `.claude/skills/` (Claude Code, Continue), avec `AGENTS.md`, le workflow GitHub `.github/workflows/angular-review.yml` et le job GitLab `.gitlab-ci.yml`.
+| Branche | Rôle | Quand |
+|---|---|---|
+| `depart` | Le point de départ : l'application, ses conventions (`AGENTS.md`), aucun skill | Module 1 |
+| `lab/speaker-spotlight` | La pull request à relire, écrite dans l'urgence, avec des défauts à trouver | Modules 1 et 2 |
+| `equipe/main` | Après le module 2 : le skill `revue-angular` commité pour toute l'équipe, avec sa CI | Bonus cloud |
+| `equipe/speaker-spotlight` | La même PR, relue en CI par le skill de l'équipe | Bonus cloud |
+| `main` | Le package de Princy installé, avec sa CI | Bonus package |
+| `feat/speaker-spotlight` | La même PR, relue par le package (PR #1) | Bonus package |
+| `solution/review-fix` | 21 corrections faites par la chaîne du package (PR #2) | Bonus package |
 
-Branches :
+## Ce que `main` contient en plus de l'application
 
-| Branche | Rôle |
-|---|---|
-| `main` | l'application saine |
-| `feat/speaker-spotlight` | la PR à relire pendant le lab (PR #1) |
-| `solution/review-fix` | **à ouvrir après le lab** : 21 corrections faites par le skill `review-fix` à partir d'une review Codex, un commit par finding |
+Le package est installé comme le ferait une équipe :
 
-## L'application
+- `.agents/skills/` (Codex, Copilot, Cursor, Gemini CLI / Antigravity, OpenCode, Kilo Code) et `.claude/skills/` (Claude Code, Continue) : `angular-review`, `review-fix`, `pr-handoff`, `skill-smith` ;
+- `AGENTS.md` et `CLAUDE.md`, qui présentent ces skills à tous les outils ;
+- la CI : `.github/workflows/angular-review.yml` (scan sans IA, porte, review IA si le secret `ANTHROPIC_API_KEY` existe) et `.gitlab-ci.yml`.
 
-Conf Planner affiche le programme d'une conférence tech fictive (données dans `public/data`) :
-
-- programme filtrable par texte (sans tenir compte des accents) et par track ;
-- favoris persistés dans le navigateur, avec un compteur dans l'en-tête et une page « Mes favoris » ;
-- page de détail d'un talk et de son speaker.
-
-Ce que `main` illustre :
-
-| Sujet | Où regarder |
-|---|---|
-| Composants standalone, OnPush par défaut (v22), zoneless, control flow `@if` / `@for` | `src/app/talks/` |
-| `input()`, `input.required()`, `output()`, `computed()`, métadonnées `host` | `talk-card.ts`, `talk-list.ts` |
-| `httpResource()` et `InjectionToken` `API_BASE_URL` (pas d'URL en dur) | `talks.store.ts`, `core/api-base-url.ts` |
-| Signal privé exposé en lecture seule, mises à jour immuables, `effect()` limité à un effet de bord | `favorites/favorites.store.ts` |
-| Routes lazy (`loadComponent`) et `withComponentInputBinding()` | `app.routes.ts`, `talk-detail.ts` |
-| Accessibilité : labels, `aria-pressed`, `ariaCurrentWhenActive`, focus après navigation | `talk-list.html`, `app.html`, `app.ts` |
-| Tests Vitest qui testent un comportement (`setInput`, `HttpTestingController`) | `*.spec.ts` |
-
-## Démarrer
-
-Prérequis : **Node.js >= 24.15** (exigé par Angular 22) et npm.
+Lancer le package sur la PR :
 
 ```bash
-npm install
-npm start                    # http://localhost:4200
-npm test                     # Vitest en mode watch
-npm test -- --watch=false    # une seule exécution (CI)
-npm run build                # build de production dans dist/
+git checkout feat/speaker-spotlight
 ```
 
-## Le lab
+- **Claude Code** : `/angular-review`
+- **Codex** : `$angular-review`
+- **autre harness** : « fais une revue de cette branche avec le skill angular-review »
 
-1. Placez-vous sur la pull request à reviewer :
-
-   ```bash
-   git checkout feat/speaker-spotlight
-   ```
-
-   Elle ajoute une page « speaker spotlight » (`/speakers/:id`) et un formulaire de proposition de talk (`/proposals`). Elle compile, mais elle n'est pas prête à merger.
-
-2. Lancez le skill `angular-review` sur la branche (base : `main`) :
-
-   - **Claude Code** : `/angular-review`
-   - **Codex** : `$angular-review`
-   - **autre harness compatible Agent Skills** : « review this branch with the angular-review skill »
-
-3. Lisez le rapport : `.review/REVIEW.md` (plus `.review/findings.json` pour les outils). Le dossier `.review/` est ignoré par git.
-
-4. Confrontez le rapport au code : chaque finding cite une ligne. Qu'est-ce que l'agent a trouvé, raté, ou signalé à tort ?
-
-Pour voir uniquement l'étape mécanique (sans LLM) :
+Le rapport arrive dans `.review/REVIEW.md`, et `.review/findings.json` alimente `review-fix`, `pr-handoff` et la CI. Pour la seule étape mécanique, sans IA :
 
 ```bash
 node .agents/skills/angular-review/scripts/scan.mjs --base main --format text
 ```
 
-Le scanner ne fait que proposer des candidats, sur les lignes modifiées. Tout ce qui demande du jugement (contexte, intention, conséquence réelle) revient aux reviewers du skill : comparez les deux sorties.
+## L'application
+
+Conf Planner affiche le programme d'une conférence tech fictive (données dans `public/data`) : programme filtrable par texte et par track, favoris persistés dans le navigateur, page de détail d'un talk et de son speaker.
+
+Prérequis : **Node.js 24.15 ou plus** (exigé par Angular 22) et npm.
+
+```bash
+npm install
+npm start                    # http://localhost:4200
+npm test -- --watch=false    # tests unitaires
+npm run build                # build de production
+```
