@@ -30,7 +30,7 @@ Les chemins `scripts/…`, `references/…` et `assets/…` sont relatifs au dos
 node scripts/perimetre.mjs
 ```
 
-Ajoute `--base <branche>` si l'utilisateur nomme une autre base que `main` ; en CI, `--base origin/<branche cible>`. Le script écrit `.review/perimetre.json` : les fichiers modifiés et leurs lignes ajoutées ou modifiées, sans les dossiers d'outillage.
+Ajoute `--base <branche>` si l'utilisateur nomme une autre base que la branche par défaut du dépôt ; en CI, `--base origin/<branche cible>`. Le script écrit `.review/perimetre.json` : les fichiers modifiés et leurs lignes ajoutées ou modifiées, sans les dossiers d'outillage.
 
 Fini quand : `.review/perimetre.json` existe.
 
