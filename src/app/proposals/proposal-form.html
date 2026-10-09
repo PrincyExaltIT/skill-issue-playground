@@ -1,0 +1,50 @@
+<header class="page-head">
+  <h1>Proposer un talk</h1>
+  <p class="page-head__lede">
+    L'appel à orateurs est ouvert jusqu'au 30 novembre. Chaque proposition est relue par le comité.
+  </p>
+</header>
+
+<div role="status">
+  @if (submitted) {
+    <p class="status">Merci ! Votre proposition a bien été enregistrée.</p>
+  }
+</div>
+
+<form class="proposal" [formGroup]="form" (ngSubmit)="submit()">
+  <input class="proposal__title" formControlName="title" placeholder="Titre du talk" />
+
+  <div class="field">
+    <label for="track">Track</label>
+    <select id="track" formControlName="track">
+      @for (option of tracks; track option) {
+        <option [value]="option">{{ option }}</option>
+      }
+    </select>
+  </div>
+
+  <div class="field">
+    <label for="abstract">Résumé</label>
+    <textarea id="abstract" rows="6" [value]="abstract()" (input)="onAbstractInput($event)"></textarea>
+    <p class="field__hint">{{ charCount() }} / 600 caractères</p>
+  </div>
+
+  <div class="field">
+    <label for="bio">Bio du speaker</label>
+    <textarea id="bio" rows="4" formControlName="bio"></textarea>
+    <p class="field__hint">HTML autorisé (gras, liens…) : la bio s'affiche sur votre page speaker.</p>
+  </div>
+
+  <button type="submit" class="button">Envoyer ma proposition</button>
+</form>
+
+<aside class="same-track" aria-labelledby="same-track-title">
+  <h2 id="same-track-title">Déjà au programme en {{ selectedTrack() }}</h2>
+  <ul>
+    @for (talk of sameTrackTalks(); track talk.id) {
+      <li>{{ talk.title }}</li>
+    } @empty {
+      <li>Aucun talk sur ce track pour l'instant.</li>
+    }
+  </ul>
+</aside>

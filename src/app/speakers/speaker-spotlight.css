@@ -1,0 +1,83 @@
+.back-link {
+  display: inline-block;
+  margin-bottom: 1.25rem;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.spotlight {
+  max-width: 48rem;
+  padding: 2rem;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-md);
+}
+
+.spotlight__header {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+.spotlight__header h1 {
+  margin: 0;
+}
+
+.spotlight__photo,
+.spotlight__initials {
+  width: 5rem;
+  height: 5rem;
+  border-radius: 50%;
+}
+
+.spotlight__photo {
+  object-fit: cover;
+}
+
+.spotlight__initials {
+  display: grid;
+  place-items: center;
+  background: linear-gradient(135deg, var(--brand), var(--accent));
+  color: #fff;
+  font-size: 1.6rem;
+  font-weight: 700;
+}
+
+.spotlight__company {
+  margin: 0.25rem 0 0;
+  color: var(--ink-muted);
+}
+
+.spotlight__bio {
+  margin: 1.5rem 0;
+}
+
+.spotlight__talks-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.talk {
+  padding: 0.75rem 1rem;
+  margin-top: 0.75rem;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.talk:hover {
+  border-color: var(--brand);
+}
+
+.talk h3 {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.talk p {
+  margin: 0.25rem 0 0;
+  color: var(--ink-muted);
+  font-size: 0.9rem;
+}

@@ -1,5 +1,6 @@
 <div class="talk-card__top">
   <span class="track-badge" [attr.data-track]="talk().track">{{ talk().track }}</span>
+  <span class="talk-card__feedback" role="status">{{ feedback() }}</span>
   <button
     type="button"
     class="fav-toggle"
@@ -24,7 +25,7 @@
   <p class="talk-card__speaker">
     <span class="avatar" aria-hidden="true">{{ initials() }}</span>
     <span>
-      <span class="talk-card__speaker-name">{{ person.name }}</span>
+      <a class="talk-card__speaker-name" [routerLink]="['/speakers', person.id]">{{ person.name }}</a>
       <span class="talk-card__company">{{ person.company }}</span>
     </span>
   </p>
