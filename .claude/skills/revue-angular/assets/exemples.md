@@ -1,6 +1,6 @@
 # Exemples
 
-Deux bons findings, pour le ton et le niveau de preuve, puis les pièges que l'équipe a déjà vus : des pistes qui ressemblent à un problème et n'en sont pas. Les exemples viennent d'autres projets : ils montrent la forme, pas les réponses.
+Deux bons findings, pour le ton et le niveau de preuve, puis les pièges que l'équipe a déjà vus : des pistes qui ressemblent à un problème et n'en sont pas. Les exemples sont inventés, hors du lab : ils montrent la forme, pas les réponses.
 
 ## Un bon finding
 
