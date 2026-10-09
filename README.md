@@ -3,6 +3,11 @@
 Le terrain d'entraînement de la formation **« Skill Issue : construis ton skill de code review »**.
 
 > **Tu suis la formation ? Pars de la branche `depart`**, puis relis la PR de `lab/speaker-spotlight`. La branche `main`, celle-ci, contient le **package de Princy** déjà installé : c'est le bonus final, à ouvrir après avoir construit ton propre skill.
+>
+> ```bash
+> git checkout depart                 # la base de la PR, en local
+> git checkout lab/speaker-spotlight  # la PR à relire
+> ```
 
 La formation, le skill de référence étape par étape, le corrigé et le package vivent dans le dépôt compagnon [`PrincyExaltIT/skill-issue`](https://github.com/PrincyExaltIT/skill-issue).
 
@@ -46,7 +51,7 @@ node .agents/skills/angular-review/scripts/scan.mjs --base main --format text
 
 Conf Planner affiche le programme d'une conférence tech fictive (données dans `public/data`) : programme filtrable par texte et par track, favoris persistés dans le navigateur, page de détail d'un talk et de son speaker.
 
-Prérequis : **Node.js 24.15 ou plus** (exigé par Angular 22) et npm.
+Prérequis : **Node.js 24.13.1 ou plus** (minimum d'Angular 22 ; 24.15 conseillé avec le CLI 22.2) et npm.
 
 ```bash
 npm install
