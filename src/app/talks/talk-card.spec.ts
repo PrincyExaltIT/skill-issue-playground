@@ -39,6 +39,19 @@ describe('TalkCard', () => {
     expect(emitted).toEqual(['signals-en-production']);
   });
 
+  it("annonce l'ajout ou le retrait selon l'état favori courant", async () => {
+    const feedback = () => host.querySelector('.talk-card__feedback')?.textContent?.trim();
+
+    favoriteButton().click();
+    await fixture.whenStable();
+    expect(feedback()).toBe('Ajouté à vos favoris');
+
+    fixture.componentRef.setInput('isFavorite', true);
+    favoriteButton().click();
+    await fixture.whenStable();
+    expect(feedback()).toBe('Retiré de vos favoris');
+  });
+
   it("expose l'état favori avec aria-pressed et une classe sur l'hôte", async () => {
     expect(favoriteButton().getAttribute('aria-pressed')).toBe('false');
     expect(favoriteButton().textContent).toContain('Favori : Signals en production');
