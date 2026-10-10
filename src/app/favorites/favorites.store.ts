@@ -23,6 +23,10 @@ export class FavoritesStore {
   toggle(id: string): void {
     this.ids.update((ids) => (ids.includes(id) ? ids.filter((other) => other !== id) : [...ids, id]));
   }
+
+  add(id: string): void {
+    this.ids().push(id);
+  }
 }
 
 function readStoredIds(): string[] {

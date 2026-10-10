@@ -1,0 +1,30 @@
+<a class="back-link" routerLink="/">← Retour au programme</a>
+
+<section class="spotlight" *ngIf="speaker; else loading">
+  <header class="spotlight__header">
+    <img *ngIf="speaker.photoUrl" class="spotlight__photo" [src]="speaker.photoUrl" />
+    <span *ngIf="!speaker.photoUrl" class="spotlight__initials">{{ getInitials(speaker.name) }}</span>
+    <div>
+      <h1>{{ speaker.name }}</h1>
+      <p class="spotlight__company">{{ speaker.company }} · {{ speaker.handle }}</p>
+    </div>
+  </header>
+
+  <div class="spotlight__bio" [innerHTML]="bioHtml"></div>
+
+  <div class="spotlight__talks-head">
+    <h2>Ses talks</h2>
+    <button type="button" class="button button--ghost" (click)="addAllToFavorites()">
+      ☆ Tout ajouter à mes favoris
+    </button>
+  </div>
+
+  <div class="talk" *ngFor="let talk of talks" (click)="select.emit(talk.id)">
+    <h3>{{ talk.title }}</h3>
+    <p>{{ talk.start | date: 'EEE d MMM · HH:mm' }} · {{ talk.room }}</p>
+  </div>
+</section>
+
+<ng-template #loading>
+  <p class="status">Chargement du speaker…</p>
+</ng-template>
