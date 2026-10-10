@@ -53,12 +53,15 @@ jobs:
           fetch-depth: 0
       - if: env.HAS_KEY == 'true'
         uses: anthropics/claude-code-action@v1
+        env:
+          CLAUDE_CODE_SUBPROCESS_ENV_SCRUB: "1"   # les commandes lancées par l'agent ne voient pas la clé d'API
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           prompt: |
             /revue-angular Relis cette PR avant qu'elle soit mergée sur ${{ github.base_ref }} (base : origin/${{ github.base_ref }}).
+          # Permissions au plus juste : lecture, les deux scripts du skill, git en lecture, écriture dans .review/ seulement.
           claude_args: >-
-            --allowedTools "Bash(git:*),Bash(node:*),Read,Grep,Glob,Write"
+            --allowedTools "Read,Grep,Glob,Edit(.review/**),Bash(node .claude/skills/revue-angular/scripts/perimetre.mjs:*),Bash(node .claude/skills/revue-angular/scripts/verifs.mjs:*),Bash(git diff:*),Bash(git log:*),Bash(git show:*),Bash(git status:*),Bash(git rev-parse:*),Bash(git merge-base:*)"
       - if: env.HAS_KEY == 'true'
         name: Publier le rapport
         env:
