@@ -1,7 +1,8 @@
 # .gitlab-ci.yml — la revue de l'équipe sur chaque merge request.
 #   revue-angular:verifs : les scripts du skill, sans IA ni secret. Le job échoue sur un BLOCKER.
 #   revue-angular:ia     : le skill complet avec Claude Code (claude -p), puis le rapport en note de la MR.
-#                          Ne tourne que si les variables masquées ANTHROPIC_API_KEY et GITLAB_REVIEW_TOKEN existent.
+#                          Ne tourne que si les variables masquées ANTHROPIC_API_KEY et GITLAB_REVIEW_TOKEN existent,
+#                          et jamais sur une MR venue d'un fork (un membre du projet pourrait la lancer avec ces variables).
 # Avec Codex, pas de job à écrire : l'intégration GitLab de Codex (bêta) relit la MR sur « @codex review » ou à
 # l'ouverture. Le job verifs, lui, reste le même quel que soit l'agent.
 # GitLab clone en profondeur limitée par défaut : GIT_DEPTH 0 donne l'ancêtre commun avec la branche cible.
@@ -21,14 +22,17 @@ revue-angular:verifs:
 revue-angular:ia:
   image: node:24
   rules:
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $ANTHROPIC_API_KEY && $GITLAB_REVIEW_TOKEN
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_SOURCE_PROJECT_ID == $CI_PROJECT_ID && $ANTHROPIC_API_KEY && $GITLAB_REVIEW_TOKEN
+  variables:
+    CLAUDE_CODE_SUBPROCESS_ENV_SCRUB: "1"   # les commandes lancées par l'agent ne voient pas la clé d'API
   script:
     - npm install -g @anthropic-ai/claude-code
     - git fetch origin "$CI_MERGE_REQUEST_TARGET_BRANCH_NAME"
+    # Permissions au plus juste : lecture, les deux scripts du skill, git en lecture, écriture dans .review/ seulement.
+    # Le jeton de publication n'existe pas pour l'agent : seul curl le reçoit, après la revue.
     - >
-      claude -p "/revue-angular Relis cette MR avant qu'elle soit mergée sur $CI_MERGE_REQUEST_TARGET_BRANCH_NAME (base : origin/$CI_MERGE_REQUEST_TARGET_BRANCH_NAME)."
-      --permission-mode acceptEdits
-      --allowedTools "Bash(git:*)" "Bash(node:*)" Read Grep Glob Write
+      env -u GITLAB_REVIEW_TOKEN claude -p "/revue-angular Relis cette MR avant qu'elle soit mergée sur $CI_MERGE_REQUEST_TARGET_BRANCH_NAME (base : origin/$CI_MERGE_REQUEST_TARGET_BRANCH_NAME)."
+      --allowedTools "Read" "Grep" "Glob" "Edit(.review/**)" "Bash(node .claude/skills/revue-angular/scripts/perimetre.mjs:*)" "Bash(node .claude/skills/revue-angular/scripts/verifs.mjs:*)" "Bash(git diff:*)" "Bash(git log:*)" "Bash(git show:*)" "Bash(git status:*)" "Bash(git rev-parse:*)" "Bash(git merge-base:*)"
     - >
       curl --fail --request POST --header "PRIVATE-TOKEN: $GITLAB_REVIEW_TOKEN"
       --data-urlencode "body@.review/REVIEW.md"
